@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "D455": {
+          "driver": "realsense",
+          "init": {
+            "ser_number": "046122250990",
+            "device": "D400",
+            "depth_subsample": 1,
+            "depth_rgb": true,
+            "depth_resolution": [848, 480],
+            "rgb_resolution": [848, 480],
+            "depth_fps": 5
+          }
+      },
+      "T265": {
+          "driver": "realsense",
+          "init": {
+            "device": "T200",
+            "pose_subsample": 20
+          }
+      },
+      "L500": {
+          "driver": "realsense",
+          "init": {
+            "ser_number": "f0246005",
+            "device": "L500",
+            "depth_subsample": 15,
+            "depth_rgb": true,
+            "depth_infra": true,
+            "depth_resolution": [1024, 768],
+            "rgb_resolution": [1280, 720],
+            "depth_fps": 30
+          }
+      }
+    },
+    "links": []
+  }
+}
