@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "camera": {
+          "driver": "sequoia-plus:LogSequoiaCamera",
+          "in": [],
+          "out": ["event", "filename"],
+          "init": {}
+      }
+    },
+    "links": []
+  }
+}
