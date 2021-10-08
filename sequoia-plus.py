@@ -4,6 +4,7 @@
 """
 
 import ptpy
+import time
 
 from threading import Thread
 
@@ -40,4 +41,5 @@ class LogSequoiaCamera:
     def request_stop(self):
         with self.camera.session():
             self.camera.terminate_open_capture(self.transactionID)
+            time.sleep(1)  # Is time.sleep acceptable??
         self.bus.shutdown()
