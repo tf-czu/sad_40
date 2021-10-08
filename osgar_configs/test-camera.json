@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "camera": {
+        "driver": "http",
+        "in": [],
+        "out": [
+          "raw"
+        ],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=mono",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      }
+    },
+    "links": []
+  }
+}
