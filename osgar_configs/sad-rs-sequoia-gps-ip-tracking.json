@@ -1,0 +1,76 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "L500": {
+          "driver": "realsense",
+          "init": {
+            "serial_number": "f0271523",
+            "device": "L500",
+            "depth_subsample": 10,
+            "depth_rgb": true,
+            "depth_infra": true,
+            "depth_resolution": [1024, 768],
+            "rgb_resolution": [1280, 720],
+            "depth_fps": 30
+          }
+      },
+      "realsense": {
+        "driver": "realsense_multicam",
+        "init": {
+          "devices": [{"type": "D400", "serial_number": "046122250990", "name": "D455"},
+                      {"type": "T200", "serial_number": "2322110209", "name": "tracking"}
+          ],
+          "depth_subsample": 10,
+          "depth_rgb": true,
+          "depth_infra": true,
+          "depth_resolution": [1280, 720],
+          "rgb_resolution": [1280, 720],
+          "depth_fps": 30,
+          "pose_subsample": 20
+        }
+      },
+      "gps": {
+          "driver": "gps",
+          "in": ["raw"],
+          "out": ["position"],
+          "init": {}
+      },
+      "gps_serial": {
+          "driver": "serial",
+          "in": [],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyS0", "speed": 4800}
+      },
+      "sequoia": {
+          "driver": "sequoia-plus:LogSequoiaCamera",
+          "in": [],
+          "out": ["event", "filename"],
+          "init": {}
+      },
+      "camera": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=color",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      },
+      "camera_mono": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=mono",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      }
+    },
+    "links": [
+      ["gps_serial.raw", "gps.raw"]
+    ]
+  }
+}
