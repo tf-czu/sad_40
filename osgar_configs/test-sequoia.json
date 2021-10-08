@@ -2,7 +2,7 @@
   "version": 2,
   "robot": {
     "modules": {
-      "camera": {
+      "sequoia": {
           "driver": "sequoia-plus:LogSequoiaCamera",
           "in": [],
           "out": ["event", "filename"],
