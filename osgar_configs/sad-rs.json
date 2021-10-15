@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "realsense": {
+        "driver": "realsense_multicam",
+        "init": {
+          "devices": [
+            {
+              "type": "D400", "serial_number": "046122250990",
+              "name": "D455", "depth_resolution": [1280, 720], "rgb_resolution":  [1280, 720]
+            },
+            {
+              "type": "T200",
+              "serial_number": "2322110209",
+              "name": "tracking"
+            }
+          ],
+          "depth_subsample": 10,
+          "depth_rgb": true,
+          "depth_infra": true,
+          "depth_fps": 30,
+          "pose_subsample": 20,
+          "rgbd": true,
+          "img_format": "*.png"
+        }
+      }
+    },
+    "links": []
+  }
+}
