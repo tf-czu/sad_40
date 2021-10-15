@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "gps": {
+          "driver": "gps",
+          "in": ["raw"],
+          "out": ["position"],
+          "init": {}
+      },
+      "gps_serial": {
+          "driver": "serial",
+          "in": [],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyS0", "speed": 4800}
+      },
+      "sequoia": {
+          "driver": "sequoia-plus:LogSequoiaCamera",
+          "in": [],
+          "out": ["event", "filename"],
+          "init": {}
+      },
+      "camera": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=color",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      },
+      "camera_mono": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=mono",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      }
+    },
+    "links": [
+      ["gps_serial.raw", "gps.raw"]
+    ]
+  }
+}
