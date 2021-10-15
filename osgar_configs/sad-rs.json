@@ -11,6 +11,10 @@
               "name": "D455", "depth_resolution": [1280, 720], "rgb_resolution":  [1280, 720]
             },
             {
+              "type": "D400", "serial_number": "115422250048",
+              "name": "D455_cvut1", "depth_resolution": [1280, 720], "rgb_resolution":  [1280, 720]
+            },
+            {
               "type": "T200",
               "serial_number": "2322110209",
               "name": "tracking"
