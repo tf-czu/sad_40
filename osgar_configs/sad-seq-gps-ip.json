@@ -2,6 +2,15 @@
   "version": 2,
   "robot": {
     "modules": {
+      "camera_cvut2": {
+          "driver": "osgar.drivers.opencv:LogOpenCVCamera",
+          "in": [],
+          "out": ["raw"],
+          "init": {
+              "port": 0,
+              "sleep": 0.2
+          }
+      },
       "gps": {
           "driver": "gps",
           "in": ["raw"],
