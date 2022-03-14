@@ -8,10 +8,10 @@
           "devices": [{"type": "D400", "serial_number": "046122250990", "name": "D455"},
                       {"type": "T200", "serial_number": "2322110209", "name": "tracking"}
           ],
-          "depth_subsample": 1,
+          "depth_subsample": 2,
           "depth_rgb": true,
-          "depth_resolution": [1280, 720],
-          "rgb_resolution": [1280, 720],
+          "depth_resolution": [848, 480],
+          "rgb_resolution": [848, 480],
           "depth_fps": 5,
           "pose_subsample": 10
         }
