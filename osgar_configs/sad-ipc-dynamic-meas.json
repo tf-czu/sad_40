@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "realsense": {
+        "driver": "realsense_multicam",
+        "init": {
+          "devices": [{"type": "D400", "serial_number": "046122250990", "name": "D455"},
+                      {"type": "T200", "serial_number": "2322110209", "name": "tracking"}
+          ],
+          "depth_subsample": 2,
+          "depth_rgb": true,
+          "depth_resolution": [848, 480],
+          "rgb_resolution": [848, 480],
+          "depth_fps": 5,
+          "pose_subsample": 10
+        }
+      },
+      "gps": {
+          "driver": "gps",
+          "in": ["raw"],
+          "out": ["position"],
+          "init": {}
+      },
+      "gps_serial": {
+          "driver": "serial",
+          "in": [],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyS0", "speed": 4800}
+      },
+      "cam_color": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=color",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      },
+      "cam_mono": {
+        "driver": "http",
+        "in": [],
+        "out": ["raw"],
+        "init": {
+          "url": "http://192.168.3.36/image?res=full&channel=mono",
+          "sleep": 0.2,
+          "timeout": 1.0
+        }
+      },
+      "basler": {
+          "driver": "basler_camera:BaslerCamera",
+          "init": {
+            "address": "192.168.1.100",
+            "storage": "~/ovosad_data"
+          }
+      }
+    },
+    "links": [
+      ["gps_serial.raw", "gps.raw"]
+    ]
+  }
+}
