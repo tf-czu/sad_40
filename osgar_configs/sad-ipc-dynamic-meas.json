@@ -28,31 +28,11 @@
           "out": ["raw"],
           "init": {"port": "/dev/ttyS0", "speed": 4800}
       },
-      "cam_color": {
-        "driver": "http",
-        "in": [],
-        "out": ["raw"],
-        "init": {
-          "url": "http://192.168.3.36/image?res=full&channel=color",
-          "sleep": 0.2,
-          "timeout": 1.0
-        }
-      },
-      "cam_mono": {
-        "driver": "http",
-        "in": [],
-        "out": ["raw"],
-        "init": {
-          "url": "http://192.168.3.36/image?res=full&channel=mono",
-          "sleep": 0.2,
-          "timeout": 1.0
-        }
-      },
       "basler": {
           "driver": "basler_camera:BaslerCamera",
           "init": {
             "address": "192.168.1.100",
-            "storage": "~/ovosad_data"
+            "storage": "/home/ovosad/ovosad_data"
           }
       }
     },
