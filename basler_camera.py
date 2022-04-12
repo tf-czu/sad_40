@@ -43,8 +43,6 @@ class BaslerCamera:
         self.bus.register('data')
 
 
-
-
     def start(self):
         self.input_thread.start()
 
@@ -83,12 +81,6 @@ class BaslerCamera:
                 self.bus.publish("data", data)
                 img.Release()
                 
-
-
-
-
-
-
 
     def request_stop(self):
         self.cam.StopGrabbing()
