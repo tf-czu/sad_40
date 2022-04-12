@@ -1,5 +1,5 @@
 """
-    Simple template for osgar camera driver.
+   Osgar driver for Basler camera.
 """
 
 import time
@@ -18,6 +18,7 @@ class BaslerCamera:
         self.address = config.get("address", False)
         self.storage_path = config.get("storage", ".")
 
+
         tlf = pylon.TlFactory.GetInstance()
         if not self.address:
             self.cam = pylon.InstantCamera(tlf.CreateFirstDevice())
@@ -33,8 +34,16 @@ class BaslerCamera:
 
         self.cam.Open()
         self.cam.ExposureAuto.SetValue('Continuous')
+#        self.cam.Gamma.SetValue(0.4)
+        #self.cam.GainAuto.SetValue("Off")
+        #self.cam.GainRaw.SetValue(34)
 
+#        a = self.cam.Gain.GetValue()
+#        print(a)
         self.bus.register('data')
+
+
+
 
     def start(self):
         self.input_thread.start()
@@ -43,26 +52,43 @@ class BaslerCamera:
         self.input_thread.join(timeout=timeout)
 
     def run_input(self):
+        folder_name = "set_{}".format(int(time.time()))
+        os.mkdir(os.path.join(self.storage_path, folder_name))
+        
+        settings_path = os.path.join(self.storage_path, folder_name, "settings.pfs")
+        pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
+        
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         while self.bus.is_alive():
+
             with self.cam.RetrieveResult(2000) as result:
                 img.AttachGrabResultBuffer(result)
 
-                name = "picture_{}.tiff".format(time.time())
-                filename = os.path.join(self.storage_path, name)
+                short_name = "picture_{}.tiff".format(time.time())
+                long_name = os.path.join(folder_name, short_name)
+                filename = os.path.join(self.storage_path, long_name)
+                # filename = os.path.join(self.storage_path, name)
                 img.Save(pylon.ImageFileFormat_Tiff, filename)
 
                 # In order to make it possible to reuse the grab result for grabbing
                 # again, we have to release the image (effectively emptying the
                 # image object).
                 data = json.dumps({
-                    "name": name,
+                    "path": long_name,
+                    "name": short_name,
                     "exposure": self.cam.ExposureTimeAbs.GetValue(),
-                    "gain": self.cam.GainRaw.GetValue(),
+                    "gain": self.cam.GainRaw.GetValue(), 
                 })
                 self.bus.publish("data", data)
                 img.Release()
+                
+
+
+
+
+
+
 
     def request_stop(self):
         self.cam.StopGrabbing()
