@@ -35,7 +35,7 @@ class BaslerCamera:
         self.cam.Open()
         self.cam.ExposureAuto.SetValue('Continuous')
 #        self.cam.Gamma.SetValue(0.4)
-        #self.cam.GainAuto.SetValue("Off")
+        self.cam.GainAuto.SetValue("Continuous")
         #self.cam.GainRaw.SetValue(34)
 
 #        a = self.cam.Gain.GetValue()
