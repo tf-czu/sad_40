@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "realsense": {
+        "driver": "realsense_multicam",
+        "init": {
+          "devices": [{"type": "D400", "serial_number": "046122250990", "name": "D455"}
+          ],
+          "depth_subsample": 2,
+          "depth_rgb": true,
+          "depth_resolution": [848, 480],
+          "rgb_resolution": [848, 480],
+          "depth_fps": 5
+        }
+      },
+      "gps": {
+          "driver": "gps",
+          "in": ["raw"],
+          "out": ["position"],
+          "init": {}
+      },
+      "gps_serial": {
+          "driver": "serial",
+          "in": [],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyS0", "speed": 4800}
+      },
+      "basler": {
+          "driver": "basler_camera:BaslerCamera",
+          "init": {
+            "address": "192.168.1.100",
+            "storage": "/home/ovosad/ovosad_data"
+          }
+      },
+      "camera": {
+          "driver": "http",
+          "in": [],
+          "out": ["raw"],
+          "init": {
+              "url": "http://192.168.1.36/img.jpg",
+              "sleep": 0.5,
+              "timeout": 1.0
+          }
+      }
+    },
+    "links": [
+      ["gps_serial.raw", "gps.raw"]
+    ]
+  }
+}
