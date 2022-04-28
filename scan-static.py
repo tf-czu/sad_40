@@ -7,16 +7,18 @@ import pyrealsense2 as rs
 import numpy as np
 import datetime
 import cv2 as cv
+import json
 
 HOST = "192.168.1.100"  # Basler camera
 STORAGE_PATH = "/home/ovosad/ovosad_data"
 
-ARECONT_URL = "http://192.168.1.36/image?res=fullf&quality=12&doublescan=1&channel=color"
+ARECONT_URL = "http://192.168.1.36/img.jpg"
 ARECONT_SET = "http://192.168.1.36/set?daynight=dual"
 
 class Basler:
-    def __init__(self):
+    def __init__(self, work_dir):
         self.address = HOST
+        self.work_dir = work_dir
         tlf = pylon.TlFactory.GetInstance()
         if not self.address:
             self.cam = pylon.InstantCamera(tlf.CreateFirstDevice())
@@ -32,22 +34,36 @@ class Basler:
 
         self.cam.Open()
 #        Set camera, move to separate method?
-        self.cam.ExposureAuto.SetValue('Continuous')
+        self.cam.ExposureAuto.SetValue('Once')  # was "Continuous"
 #        self.cam.Gamma.SetValue(0.4)
-        self.cam.GainAuto.SetValue("Continuous")
+        self.cam.GainAuto.SetValue("Once")
         #self.cam.GainRaw.SetValue(34)
 #        a = self.cam.Gain.GetValue()
+        self.cam.AutoTargetValue.SetValue(205)
+        self.cam.BalanceWhiteAuto.SetValue("Once")
+
+        settings_path = os.path.join(self.work_dir, "settings.pfs")
+        pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
+
 
     def take_pic(self, file_path):
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
             img.AttachGrabResultBuffer(result)
-            img.Save(pylon.ImageFileFormat_Tiff, file_path)  # TODO filename!!
+            img.Save(pylon.ImageFileFormat_Tiff, file_path)
+            
+            data = json.dumps({
+                    "exposure": self.cam.ExposureTimeAbs.GetValue(),
+                    "gain": self.cam.GainRaw.GetValue(), 
+                })
 
             img.Release()
 
         self.cam.StopGrabbing()
+        
+        return data
+
 
     def close_cam(self):
         self.cam.Close()
@@ -101,20 +117,27 @@ def main(label, note):
     day_name = datetime.datetime.now().strftime("%y%m%d")
     label_dir = "{}_{}".format(datetime.datetime.now().strftime("sad_%H%M%S"), label)
     # create working directory
+    os.makedirs(os.path.join(STORAGE_PATH, day_name), exist_ok=True)
     work_dir_path = os.path.join(STORAGE_PATH, day_name, label_dir)
-    os.mkdir(work_dir_path)
+    os.makedirs(work_dir_path, exist_ok=True)
 
-    basler = Basler()
+    basler = Basler(work_dir_path)
     rs_cam = Realsense_cam()
     set_url = ARECONT_SET
     url = ARECONT_URL
     arecont = Arecont(set_url)
 
+    basler_log = open(os.path.join(work_dir_path, "basler.log"), "w")
+    if note is not None:
+        basler_log.write(note+"\n")
+    print("scaning ..")
     for ii in range(5):
         arecont_img = arecont.arecont_take_pic(url)
         depth, rgb = rs_cam.rs_take_pic()
         basler_img_path = os.path.join(work_dir_path, "im_%02d.tiff" %ii)
-        basler.take_pic(basler_img_path)
+        basler_data = basler.take_pic(basler_img_path)
+        basler_log.write(basler_data+"\n")
+        basler_log.flush()
 
         arecont_img_path = os.path.join(work_dir_path, "im_arecont_%02d.jpeg" %ii)
         if arecont_img is not None:
@@ -135,7 +158,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('label', help='Measurement label')
-    parser.add_argument('--note', help='Measurement note', default="")
+    parser.add_argument('--note', help='Measurement note', default=None)
     args = parser.parse_args()
 
     main(args.label, args.note)
