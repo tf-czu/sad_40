@@ -39,8 +39,9 @@ class Basler:
         self.cam.GainAuto.SetValue("Once")
         #self.cam.GainRaw.SetValue(34)
 #        a = self.cam.Gain.GetValue()
-        self.cam.AutoTargetValue.SetValue(205)
+        self.cam.AutoTargetValue.SetValue(85)
         self.cam.BalanceWhiteAuto.SetValue("Once")
+        self.cam.BlackLevelRaw.SetValue(500)
 
         settings_path = os.path.join(self.work_dir, "settings.pfs")
         pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
@@ -151,7 +152,6 @@ def main(label, note):
 
     basler.close_cam()
     rs_cam.rs_stop()
-
 
 
 if __name__ == "__main__":
