@@ -8,12 +8,19 @@ import numpy as np
 import datetime
 import cv2 as cv
 import json
+import psutil
 
 HOST = "192.168.1.100"  # Basler camera
 STORAGE_PATH = "/home/ovosad/ovosad_data"
 
 ARECONT_URL = "http://192.168.1.36/img.jpg"
 ARECONT_SET = "http://192.168.1.36/set?daynight=dual"
+
+
+def get_disk_space():
+    disk = psutil.disk_usage("/")
+    return disk.free/1024**3
+
 
 class Basler:
     def __init__(self, work_dir):
@@ -55,10 +62,10 @@ class Basler:
             img.AttachGrabResultBuffer(result)
             img.Save(pylon.ImageFileFormat_Tiff, file_path)
             
-            data = json.dumps({
+            data = {
                     "exposure": self.cam.ExposureTimeAbs.GetValue(),
                     "gain": self.cam.GainRaw.GetValue(), 
-                })
+                }
 
             img.Release()
 
@@ -129,17 +136,17 @@ def main(label, note):
     url = ARECONT_URL
     arecont = Arecont(set_url)
 
-    basler_log = open(os.path.join(work_dir_path, "basler.log"), "w")
+    basler_data = {}
     if note is not None:
-        basler_log.write(note+"\n")
+        basler_data["note"] = note
+    pic_param_data = []
     print("scaning ..")
     for ii in range(5):
         arecont_img = arecont.arecont_take_pic(url)
         depth, rgb = rs_cam.rs_take_pic()
         basler_img_path = os.path.join(work_dir_path, "im_%02d.tiff" %ii)
-        basler_data = basler.take_pic(basler_img_path)
-        basler_log.write(basler_data+"\n")
-        basler_log.flush()
+        pic_param = basler.take_pic(basler_img_path)
+        pic_param_data.append(pic_param)
 
         arecont_img_path = os.path.join(work_dir_path, "im_arecont_%02d.jpeg" %ii)
         if arecont_img is not None:
@@ -153,6 +160,14 @@ def main(label, note):
 
     basler.close_cam()
     rs_cam.rs_stop()
+    basler_data["pic_params"] = pic_param_data
+    with open(os.path.join(work_dir_path, "basler.log"), "w") as log:
+        json.dump(basler_data, log)
+
+    disk_space = get_disk_space()
+    if disk_space < 10:  # space in GB
+        print("-------------------")
+        print("Warning: free disk space %0.1f" %disk_space)
 
 
 if __name__ == "__main__":
