@@ -34,14 +34,15 @@ class Basler:
 
         self.cam.Open()
 #        Set camera, move to separate method?
-        self.cam.ExposureAuto.SetValue('Once')  # was "Continuous"
+        self.cam.ExposureAuto.SetValue('Off')  # was "Continuous", "Once"
+        self.cam.ExposureTimeAbs.SetValue(90_000)
 #        self.cam.Gamma.SetValue(0.4)
-        self.cam.GainAuto.SetValue("Once")
-        #self.cam.GainRaw.SetValue(34)
+        self.cam.GainAuto.SetValue("Off")
+        self.cam.GainRaw.SetValue(34)
 #        a = self.cam.Gain.GetValue()
         self.cam.AutoTargetValue.SetValue(85)
         self.cam.BalanceWhiteAuto.SetValue("Once")
-        self.cam.BlackLevelRaw.SetValue(500)
+#        self.cam.BlackLevelRaw.SetValue(500)
 
         settings_path = os.path.join(self.work_dir, "settings.pfs")
         pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
