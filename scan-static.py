@@ -9,6 +9,7 @@ import datetime
 import cv2 as cv
 import json
 import psutil
+import time
 
 HOST = "192.168.1.100"  # Basler camera
 STORAGE_PATH = "/home/ovosad/ovosad_data"
@@ -42,7 +43,7 @@ class Basler:
         self.cam.Open()
 #        Set camera, move to separate method?
         self.cam.ExposureAuto.SetValue('Off')  # was "Continuous", "Once"
-        self.cam.ExposureTimeAbs.SetValue(90_000)
+        self.cam.ExposureTimeAbs.SetValue(170_000)
 #        self.cam.Gamma.SetValue(0.4)
         self.cam.GainAuto.SetValue("Off")
         self.cam.GainRaw.SetValue(34)
@@ -54,8 +55,18 @@ class Basler:
         settings_path = os.path.join(self.work_dir, "settings.pfs")
         pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
 
+    def set_exposure(self):
+        self.cam.Width.SetValue(2304)
+        self.cam.OffsetX.SetValue(2304)
+        self.cam.ExposureAuto.SetValue('Once')
+
+        self.cam.StartGrabbing()
+        time.sleep(0.2)
+        self.cam.StopGrabbing()
+        self.cam.ExposureAuto.SetValue('Off')
 
     def take_pic(self, file_path):
+        self.set_exposure()
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
@@ -161,7 +172,7 @@ def main(label, note):
     basler.close_cam()
     rs_cam.rs_stop()
     basler_data["pic_params"] = pic_param_data
-    with open(os.path.join(work_dir_path, "basler.log"), "w") as log:
+    with open(os.path.join(work_dir_path, "basler.json"), "w") as log:
         json.dump(basler_data, log)
 
     disk_space = get_disk_space()
