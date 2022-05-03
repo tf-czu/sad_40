@@ -61,7 +61,10 @@ class Basler:
         self.cam.ExposureAuto.SetValue('Once')
 
         self.cam.StartGrabbing()
-        time.sleep(0.2)
+        img = pylon.PylonImage()
+        with self.cam.RetrieveResult(2000) as result:
+            img.AttachGrabResultBuffer(result)
+            time.sleep(0.2)
         self.cam.StopGrabbing()
         self.cam.ExposureAuto.SetValue('Off')
 
