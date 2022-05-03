@@ -55,7 +55,7 @@ class Basler:
         settings_path = os.path.join(self.work_dir, "settings.pfs")
         pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
 
-    def set_exposure(self):
+    def set_exposure(self, t=0.2):
         self.cam.Width.SetValue(2304)
         self.cam.OffsetX.SetValue(2304)
         self.cam.ExposureAuto.SetValue('Once')
@@ -64,15 +64,18 @@ class Basler:
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
             img.AttachGrabResultBuffer(result)
-            time.sleep(0.2)
+            time.sleep(t)
+            expo_value = self.cam.ExposureTimeAbs.GetValue()
 
         self.cam.StopGrabbing()
         self.cam.OffsetX.SetValue(0)
         self.cam.Width.SetValue(2*2304)
+        print(expo_value)
+        #self.cam.ExposureTimeRaw.SetValue(int(expo_value))
         self.cam.ExposureAuto.SetValue('Off')
 
-    def take_pic(self, file_path):
-        self.set_exposure()
+    def take_pic(self, file_path, expo_sleep = 0.2):
+        self.set_exposure(expo_sleep)
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
@@ -158,11 +161,14 @@ def main(label, note):
         basler_data["note"] = note
     pic_param_data = []
     print("scaning ..")
-    for ii in range(5):
+    for ii in range(3):
         arecont_img = arecont.arecont_take_pic(url)
         depth, rgb = rs_cam.rs_take_pic()
         basler_img_path = os.path.join(work_dir_path, "im_%02d.tiff" %ii)
-        pic_param = basler.take_pic(basler_img_path)
+        if ii == 0:  # first picture
+            pic_param = basler.take_pic(basler_img_path, expo_sleep = 1)
+        else:
+            pic_param = basler.take_pic(basler_img_path)
         pic_param_data.append(pic_param)
 
         arecont_img_path = os.path.join(work_dir_path, "im_arecont_%02d.jpeg" %ii)
