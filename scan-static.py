@@ -65,7 +65,10 @@ class Basler:
         with self.cam.RetrieveResult(2000) as result:
             img.AttachGrabResultBuffer(result)
             time.sleep(0.2)
+
         self.cam.StopGrabbing()
+        self.cam.OffsetX.SetValue(0)
+        self.cam.Width.SetValue(2*2304)
         self.cam.ExposureAuto.SetValue('Off')
 
     def take_pic(self, file_path):
