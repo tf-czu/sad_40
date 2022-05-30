@@ -65,17 +65,17 @@ class Basler:
         with self.cam.RetrieveResult(2000) as result:
             img.AttachGrabResultBuffer(result)
             time.sleep(t)
-            expo_value = self.cam.ExposureTimeAbs.GetValue()
+            self.expo_value = self.cam.ExposureTimeAbs.GetValue()
 
         self.cam.StopGrabbing()
         self.cam.OffsetX.SetValue(0)
         self.cam.Width.SetValue(2*2304)
-        print(expo_value)
+        print(self.expo_value)
         #self.cam.ExposureTimeRaw.SetValue(int(expo_value))
         self.cam.ExposureAuto.SetValue('Off')
 
     def take_pic(self, file_path, expo_sleep = 0.2):
-        self.set_exposure(expo_sleep)
+        # self.set_exposure(expo_sleep)
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
@@ -140,7 +140,7 @@ class Arecont:
                 return data
         except socket.timeout:
             pass
-
+        
 
 def main(label, note):
     day_name = datetime.datetime.now().strftime("%y%m%d")
@@ -165,11 +165,11 @@ def main(label, note):
         arecont_img = arecont.arecont_take_pic(url)
         depth, rgb = rs_cam.rs_take_pic()
         basler_img_path = os.path.join(work_dir_path, "im_%02d.tiff" %ii)
-        if ii == 0:  # first picture
-            pic_param = basler.take_pic(basler_img_path, expo_sleep = 1)
-        else:
-            pic_param = basler.take_pic(basler_img_path)
-        pic_param_data.append(pic_param)
+        # if ii == 0:  # first picture
+        #     pic_param = basler.take_pic(basler_img_path, expo_sleep = 1)
+        # else:
+        #     pic_param = basler.take_pic(basler_img_path)
+        # pic_param_data.append(pic_param)
 
         arecont_img_path = os.path.join(work_dir_path, "im_arecont_%02d.jpeg" %ii)
         if arecont_img is not None:
@@ -180,7 +180,19 @@ def main(label, note):
         rs_rgb_path = os.path.join(work_dir_path, "rs_rgb_%02d.png" %ii)
         np.save(rs_depth_path, depth)
         cv.imwrite(rs_rgb_path, rgb)
-
+    
+    ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
+    basler.set_exposure()
+    for ev in ev_values:
+        try:
+            basler.cam.ExposureTimeAbs.SetValue(basler.expo_value*ev)
+            basler_img_path = os.path.join(work_dir_path, "im_%02d.png" % int(basler.cam.ExposureTimeAbs.GetValue()))
+            pic_param = basler.take_pic(basler_img_path, expo_sleep=1)
+            print("EV %f" %ev, basler.cam.ExposureTimeAbs.GetValue())
+            pic_param_data.append(pic_param)
+        except Exception as e:
+            print("EV %f fail:" %ev, e)
+            
     basler.close_cam()
     rs_cam.rs_stop()
     basler_data["pic_params"] = pic_param_data
