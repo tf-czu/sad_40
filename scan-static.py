@@ -83,6 +83,7 @@ class Basler:
             img.Save(pylon.ImageFileFormat_Tiff, file_path)
             
             data = {
+                    "file_path": file_path,
                     "exposure": self.cam.ExposureTimeAbs.GetValue(),
                     "gain": self.cam.GainRaw.GetValue(), 
                 }
@@ -183,10 +184,11 @@ def main(label, note):
     
     ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
     basler.set_exposure()
-    for ev in ev_values:
+    for ii, ev in enumerate(ev_values):
         try:
             basler.cam.ExposureTimeAbs.SetValue(basler.expo_value*ev)
-            basler_img_path = os.path.join(work_dir_path, "im_%02d.png" % int(basler.cam.ExposureTimeAbs.GetValue()))
+            # basler_img_path = os.path.join(work_dir_path, "im_%02d.png" % int(basler.cam.ExposureTimeAbs.GetValue()))
+            basler_img_path = os.path.join(work_dir_path, "im_%02d.png" %ii)
             pic_param = basler.take_pic(basler_img_path, expo_sleep=1)
             print("EV %f" %ev, basler.cam.ExposureTimeAbs.GetValue())
             pic_param_data.append(pic_param)
@@ -196,8 +198,9 @@ def main(label, note):
     basler.close_cam()
     rs_cam.rs_stop()
     basler_data["pic_params"] = pic_param_data
+    basler_data["ev_values"] = ev_values
     with open(os.path.join(work_dir_path, "basler.json"), "w") as log:
-        json.dump(basler_data, log)
+        json.dump(basler_data, log, ensure_ascii=False, indent=4)
 
     disk_space = get_disk_space()
     if disk_space < 10:  # space in GB
