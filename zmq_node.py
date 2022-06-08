@@ -33,7 +33,7 @@ def push_msg(data):
 
     try:
         with contextlib.closing(socket):
-            raw = osgar.lib.serialize(data)
+            raw = osgar.lib.serialize.serialize(data)
             socket.send_multipart([bytes("control_msg", 'ascii'), raw])
     except zmq.ZMQError as e:
         print(e)
