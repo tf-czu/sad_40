@@ -8,12 +8,20 @@ import numpy as np
 import datetime
 import cv2 as cv
 import json
+import psutil
+import time
 
 HOST = "192.168.1.100"  # Basler camera
 STORAGE_PATH = "/home/ovosad/ovosad_data"
 
 ARECONT_URL = "http://192.168.1.36/img.jpg"
 ARECONT_SET = "http://192.168.1.36/set?daynight=dual"
+
+
+def get_disk_space():
+    disk = psutil.disk_usage("/")
+    return disk.free/1024**3
+
 
 class Basler:
     def __init__(self, work_dir):
@@ -35,7 +43,7 @@ class Basler:
         self.cam.Open()
 #        Set camera, move to separate method?
         self.cam.ExposureAuto.SetValue('Off')  # was "Continuous", "Once"
-        self.cam.ExposureTimeAbs.SetValue(90_000)
+        self.cam.ExposureTimeAbs.SetValue(170_000)
 #        self.cam.Gamma.SetValue(0.4)
         self.cam.GainAuto.SetValue("Off")
         self.cam.GainRaw.SetValue(34)
@@ -47,18 +55,38 @@ class Basler:
         settings_path = os.path.join(self.work_dir, "settings.pfs")
         pylon.FeaturePersistence.Save(settings_path, self.cam.GetNodeMap())
 
+    def set_exposure(self, t=0.2):
+        self.cam.Width.SetValue(2304)
+        self.cam.OffsetX.SetValue(2304)
+        self.cam.ExposureAuto.SetValue('Once')
 
-    def take_pic(self, file_path):
+        self.cam.StartGrabbing()
+        img = pylon.PylonImage()
+        with self.cam.RetrieveResult(2000) as result:
+            img.AttachGrabResultBuffer(result)
+            time.sleep(t)
+            self.expo_value = self.cam.ExposureTimeAbs.GetValue()
+
+        self.cam.StopGrabbing()
+        self.cam.OffsetX.SetValue(0)
+        self.cam.Width.SetValue(2*2304)
+        print(self.expo_value)
+        #self.cam.ExposureTimeRaw.SetValue(int(expo_value))
+        self.cam.ExposureAuto.SetValue('Off')
+
+    def take_pic(self, file_path, expo_sleep = 0.2):
+        # self.set_exposure(expo_sleep)
         self.cam.StartGrabbing()
         img = pylon.PylonImage()
         with self.cam.RetrieveResult(2000) as result:
             img.AttachGrabResultBuffer(result)
             img.Save(pylon.ImageFileFormat_Tiff, file_path)
             
-            data = json.dumps({
+            data = {
+                    "file_path": file_path,
                     "exposure": self.cam.ExposureTimeAbs.GetValue(),
                     "gain": self.cam.GainRaw.GetValue(), 
-                })
+                }
 
             img.Release()
 
@@ -113,7 +141,7 @@ class Arecont:
                 return data
         except socket.timeout:
             pass
-
+        
 
 def main(label, note):
     day_name = datetime.datetime.now().strftime("%y%m%d")
@@ -129,17 +157,20 @@ def main(label, note):
     url = ARECONT_URL
     arecont = Arecont(set_url)
 
-    basler_log = open(os.path.join(work_dir_path, "basler.log"), "w")
+    basler_data = {}
     if note is not None:
-        basler_log.write(note+"\n")
+        basler_data["note"] = note
+    pic_param_data = []
     print("scaning ..")
-    for ii in range(5):
+    for ii in range(3):
         arecont_img = arecont.arecont_take_pic(url)
         depth, rgb = rs_cam.rs_take_pic()
         basler_img_path = os.path.join(work_dir_path, "im_%02d.tiff" %ii)
-        basler_data = basler.take_pic(basler_img_path)
-        basler_log.write(basler_data+"\n")
-        basler_log.flush()
+        # if ii == 0:  # first picture
+        #     pic_param = basler.take_pic(basler_img_path, expo_sleep = 1)
+        # else:
+        #     pic_param = basler.take_pic(basler_img_path)
+        # pic_param_data.append(pic_param)
 
         arecont_img_path = os.path.join(work_dir_path, "im_arecont_%02d.jpeg" %ii)
         if arecont_img is not None:
@@ -150,9 +181,31 @@ def main(label, note):
         rs_rgb_path = os.path.join(work_dir_path, "rs_rgb_%02d.png" %ii)
         np.save(rs_depth_path, depth)
         cv.imwrite(rs_rgb_path, rgb)
-
+    
+    ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
+    basler.set_exposure()
+    for ii, ev in enumerate(ev_values):
+        try:
+            basler.cam.ExposureTimeAbs.SetValue(basler.expo_value*ev)
+            # basler_img_path = os.path.join(work_dir_path, "im_%02d.png" % int(basler.cam.ExposureTimeAbs.GetValue()))
+            basler_img_path = os.path.join(work_dir_path, "im_%02d.png" %ii)
+            pic_param = basler.take_pic(basler_img_path, expo_sleep=1)
+            print("EV %f" %ev, basler.cam.ExposureTimeAbs.GetValue())
+            pic_param_data.append(pic_param)
+        except Exception as e:
+            print("EV %f fail:" %ev, e)
+            
     basler.close_cam()
     rs_cam.rs_stop()
+    basler_data["pic_params"] = pic_param_data
+    basler_data["ev_values"] = ev_values
+    with open(os.path.join(work_dir_path, "basler.json"), "w") as log:
+        json.dump(basler_data, log, ensure_ascii=False, indent=4)
+
+    disk_space = get_disk_space()
+    if disk_space < 10:  # space in GB
+        print("-------------------")
+        print("Warning: free disk space %0.1f" %disk_space)
 
 
 if __name__ == "__main__":
