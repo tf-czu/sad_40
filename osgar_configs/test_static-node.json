@@ -11,13 +11,22 @@
       },
       "measure_node": {
         "driver": "measure_node:MeasureNode",
+        "out": "work_dir",
         "init": {
           "storage_path": "tmp"
         }
+      },
+      "arecont": {
+        "driver": "arecont:Arecont",
+        "in": "work_dir",
+        "out": "image",
+        "init": {}
       }
     },
     "links": [
-              ["from_control.control_msg", "measure_node.control_msg"]
+      ["from_control.control_msg", "measure_node.control_msg"],
+      ["measure_node.work_dir", "arecont.work_dir"],
+      ["arecont.image", "measure_node.arecont_image"]
     ]
   }
 }
