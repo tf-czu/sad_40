@@ -18,10 +18,10 @@ def pull_msg():
     with contextlib.closing(socket):
         try:
             channel, raw = socket.recv_multipart()
-            message = osgar.lib.serialize.deserialize(raw)
-            return message
+            data = osgar.lib.serialize.deserialize(raw)
+            return channel, data
 
-        except zmq.error.Again:
+        except:  # zmq.error.Again:  # TODO
                 pass
 
 
