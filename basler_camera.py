@@ -16,7 +16,6 @@ class BaslerCamera(Node):
     def __init__(self, config, bus):
         super().__init__(config, bus)
         self.address = config.get("address", False)
-
         tlf = pylon.TlFactory.GetInstance()
         if not self.address:
             self.cam = pylon.InstantCamera(tlf.CreateFirstDevice())
@@ -72,8 +71,11 @@ class BaslerCamera(Node):
 
 
     def update(self):
-        #dt, channel, data = self.listen() # TODO: in production expect path in data¨
-        data = "/home/ovosad/ovosad_data/test_basler_02"
+        dt, channel, data = self.listen()
+        # print(dt, channel, data)
+        if channel != "work_dir":
+            return
+        # data = "/home/ovosad/ovosad_data/test_basler_02"
         save_path = data
 
         metadata = {"pictures": {}}
@@ -81,7 +83,6 @@ class BaslerCamera(Node):
         for ii, ev in enumerate(ev_values):
             try:
                 self.cam.ExposureTimeAbs.SetValue(self.expo_value * ev)
-                # basler_img_path = os.path.join(work_dir_path, "im_%02d.png" % int(basler.cam.ExposureTimeAbs.GetValue()))
                 short_name = "im_basler_EV{}.tiff".format(ii)
                 long_name = os.path.join(save_path, short_name)
                 self.take_pic(long_name)
