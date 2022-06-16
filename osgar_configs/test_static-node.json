@@ -27,12 +27,20 @@
         "in": "work_dir",
         "out": "image",
         "init": {}
+      },
+      "rs": {
+        "driver": "rs_rgbd:Realsense_cam",
+        "init": {}
       }
     },
     "links": [
       ["from_control.control_msg", "measure_node.control_msg"],
-      ["measure_node.work_dir", "arecont.work_dir"],
+      ["measure_node.work_dir", "arecont.work_dirrrr"],
       ["arecont.image", "measure_node.arecont_image"],
+
+      ["measure_node.work_dir", "rs.work_dir"],
+      ["rs.color", "measure_node.rs_image"],
+      ["rs.depth", "measure_node.rs_depth"],
 
       ["measure_node.arecont_prev", "to_control.arecont_prev"],
       ["measure_node.basler_prev", "to_control.basler_prev"],
