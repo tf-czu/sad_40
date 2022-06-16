@@ -33,8 +33,9 @@ class MeasureNode(Node):
         return work_dir_name
 
     def process_image(self, image_data):
-        im_arr = cv2.imdecode(np.frombuffer(image_data, dtype=np.uint8), 1)  # numpy arr from basler and rs?
-        resized = cv2.resize(im_arr, (600, 450))
+        if not isinstance(image_data, np.ndarray):
+            image_data = cv2.imdecode(np.frombuffer(image_data, dtype=np.uint8), 1)  # numpy arr from basler and rs?
+        resized = cv2.resize(image_data, (600, 450))
         __, ret_im = cv2.imencode('*.jpeg', resized)
 
         return ret_im
@@ -55,11 +56,11 @@ class MeasureNode(Node):
 
                 elif self.arecont_image:
                     self.publish("arecont_prev", self.process_image(self.arecont_image))
-                elif self.basler_image:
+                elif self.basler_image is not None:
                     self.publish("basler_prev", self.process_image(self.basler_image))
-                elif self.rs_image:
+                elif self.rs_image is not None:
                     self.publish("rs_prev", self.process_image(self.rs_image))
-                elif self.rs_depth:
+                elif self.rs_depth is not None:
                     self.publish("depth_prev", self.process_depth(self.rs_depth))
 
 
