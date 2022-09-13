@@ -42,7 +42,11 @@ class MeasureNode(Node):
 
 
     def process_depth(self, depth):
-        pass
+        depth_color = cv2.applyColorMap(cv2.convertScaleAbs(depth, alpha=0.03), cv2.COLORMAP_JET)
+        resized = cv2.resize(depth_color, (600, 450))
+        __, ret_im = cv2.imencode('*.jpeg', resized)
+
+        return ret_im
 
 
     def run(self):
@@ -54,14 +58,19 @@ class MeasureNode(Node):
                     self.publish("work_dir", work_dir_name)
                     self.control_msg = None
 
-                elif self.arecont_image:
+                elif self.arecont_image is not None:
                     self.publish("arecont_prev", self.process_image(self.arecont_image))
+                    self.arecont_image = None
                 elif self.basler_image is not None:
                     self.publish("basler_prev", self.process_image(self.basler_image))
+                    self.basler_image = None
                 elif self.rs_image is not None:
                     self.publish("rs_prev", self.process_image(self.rs_image))
+                    self.rs_image = None
+
                 elif self.rs_depth is not None:
                     self.publish("depth_prev", self.process_depth(self.rs_depth))
+                    self.rs_depth = None
 
 
         except BusShutdownException:
