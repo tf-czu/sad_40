@@ -5,14 +5,16 @@
       "from_control": {
           "driver": "subt.pull:Pull",
           "init": {
-            "endpoint": "tcp://127.0.0.1:5556",
+            "bind": true,
+            "endpoint": "tcp://*:5556",
             "outputs": ["control_msg"]
           }
       },
       "to_control": {
         "driver": "subt.push:Push",
         "init": {
-          "endpoint": "tcp://127.0.0.1:5555"
+          "bind": true,
+          "endpoint": "tcp://*:5555"
         }
       },
       "measure_node": {
@@ -35,7 +37,7 @@
     },
     "links": [
       ["from_control.control_msg", "measure_node.control_msg"],
-      ["measure_node.work_dir", "arecont.work_dirrrr"],
+      ["measure_node.work_dir", "arecont.work_dir"],
       ["arecont.image", "measure_node.arecont_image"],
 
       ["measure_node.work_dir", "rs.work_dir"],
