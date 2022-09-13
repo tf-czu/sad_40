@@ -8,7 +8,7 @@ import osgar.lib.serialize
 
 
 class ZmqPull:
-    def __init__(self, endpoint = "tcp://127.0.0.1:5555"):
+    def __init__(self, endpoint = "tcp://192.168.1.10:5555"): # "tcp://127.0.0.1:5555"
         self.endpoint = endpoint
         self.clear_images()
 
@@ -38,7 +38,7 @@ class ZmqPull:
                         pass
 
 
-def push_msg(data, endpoint = "tcp://127.0.0.1:5556"):
+def push_msg(data, endpoint = "tcp://192.168.1.10:5556"):  # "tcp://127.0.0.1:5556"
     context = zmq.Context.instance()
     socket = context.socket(zmq.PUSH)
 
