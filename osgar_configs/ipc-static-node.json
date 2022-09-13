@@ -21,7 +21,7 @@
         "driver": "measure_node:MeasureNode",
         "out": "work_dir",
         "init": {
-          "storage_path": "tmp"
+          "storage_path": "/home/ovosad/ovosad_data"
         }
       },
       "arecont": {
