@@ -3,21 +3,32 @@
 """
 
 import time
-from zmq_node import push_msg, pull_msg
+from zmq_node import push_msg, ZmqPull
+from threading import Thread
 
 
 def control_main():
+    prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev"]
+    server = ZmqPull()
+    thread = Thread(target=server.pull_msg)
+    first_run = True
     while True:
         label = input("Enter label: ")
         print(f"Sending: {label}")
+        if first_run:
+            first_run = False
+        else:
+            thread.join()
+            server.clear_images()
+
+        thread.start()
         push_msg(label)
 
-        while True:
-            response = pull_msg()
-            if response:
-                print(response[0])
-                break
-
+        for ii in range(10):
+            for prev_name in prev_images:
+                data = getattr(server, prev_name)
+                if data is not None:
+                    print(ii, prev_name, len(data))
             time.sleep(0.5)
 
 if __name__ == "__main__":
