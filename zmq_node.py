@@ -7,29 +7,45 @@ import contextlib
 import osgar.lib.serialize
 
 
-def pull_msg():
-    context = zmq.Context.instance()
-    socket = context.socket(zmq.PULL)
-    # https://stackoverflow.com/questions/7538988/zeromq-how-to-prevent-infinite-wait
-    socket.RCVTIMEO = 200  # milliseconds
+class ZmqPull:
+    def __init__(self, endpoint = "tcp://127.0.0.1:5555"):
+        self.endpoint = endpoint
+        self.clear_images()
 
-    socket.LINGER = 100
-    socket.bind("tcp://*:5555")
-    with contextlib.closing(socket):
-        try:
-            channel, raw = socket.recv_multipart()
-            data = osgar.lib.serialize.deserialize(raw)
-            return channel, data
-
-        except:  # zmq.error.Again:  # TODO
-                pass
+    def clear_images(self):
+        self.basler_prev = None
+        self.arecont_prev = None
+        self.rs_prev = None
+        self.depth_prev = None
 
 
-def push_msg(data):
+    def pull_msg(self):
+        context = zmq.Context.instance()
+        socket = context.socket(zmq.PULL)
+        # https://stackoverflow.com/questions/7538988/zeromq-how-to-prevent-infinite-wait
+        socket.RCVTIMEO = 200  # milliseconds
+
+        socket.connect(self.endpoint)
+        with contextlib.closing(socket):
+            while True:
+                try:
+                    channel, raw = socket.recv_multipart()
+                    channel = channel.decode('ascii')
+                    data = osgar.lib.serialize.deserialize(raw)
+                    setattr(self, channel, data)
+
+                except zmq.error.Again:
+                        pass
+
+
+def push_msg(data, endpoint = "tcp://127.0.0.1:5556"):
     context = zmq.Context.instance()
     socket = context.socket(zmq.PUSH)
-    socket.setsockopt(zmq.LINGER, 100)  # milliseconds
-    socket.bind("tcp://*:5556")
+
+    # https://stackoverflow.com/questions/7538988/zeromq-how-to-prevent-infinite-wait
+    socket.SNDTIMEO = int(1000)  # convert to milliseconds
+    socket.LINGER = 100  # milliseconds
+    socket.connect(endpoint)
 
     try:
         with contextlib.closing(socket):
