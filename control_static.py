@@ -18,7 +18,9 @@ def control_main():
         if first_run:
             first_run = False
         else:
-            thread.join()
+            print(thread.join(2))
+            time.sleep(2)
+            thread = Thread(target=server.pull_msg)
             server.clear_images()
 
         thread.start()
@@ -29,6 +31,9 @@ def control_main():
                 data = getattr(server, prev_name)
                 if data is not None:
                     print(ii, prev_name, len(data))
+                    if prev_name == "depth_prev":
+                        with open("depth_im.jpg", "wb") as f:
+                            f.write(data)
             time.sleep(0.5)
 
 if __name__ == "__main__":
