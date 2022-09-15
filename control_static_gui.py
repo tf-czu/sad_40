@@ -46,6 +46,7 @@ class ControlStatic:
         else:
             for name in self.prev_images:
                 img = getattr(self, name)
+                setattr(self, name, None)
                 if img is not None:
                     cv2.imshow(name, img)
 
@@ -63,7 +64,7 @@ class ControlStatic:
         if self.thread is not None:
             self.thread.join(2)
 
-        self.thread = Thread(target=self.server.pull_msg)
+        self.thread = Thread(target=self.server.pull_msg, daemon=True)
         self.server.clear_images()
         self.thread.start()
         self.runnig = True
@@ -71,7 +72,7 @@ class ControlStatic:
 
     def main(self):
         app.setResizable(canResize=False)
-        app.setTitle("Sas 4.0")
+        app.setTitle("Sad 4.0")
 
 
         app.setSticky("news")
@@ -82,19 +83,14 @@ class ControlStatic:
 
         app.go()
 
-        if self.thread:
-            print(self.thread.join(2))
-            print(self.exit_event.set())
-
     # context manager functions
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, traceback):
-        print("exit jl")
         if self.thread:
             self.thread.join(2)
-            self.exit_event.set()
+            print(self.thread.is_alive())
 
 
 if __name__ == "__main__":
