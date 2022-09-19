@@ -38,6 +38,19 @@
           "out": ["raw"],
           "init": {"host": "192.168.1.71", "port": 2111, "timeout": 0.5}
       },
+      "arecont": {
+        "driver": "arecont:Arecont",
+        "out": "image",
+        "init": {
+          "continuously": true
+        }
+      },
+      "ultrasonic_serial": {
+          "driver": "serial",
+          "in": ["raw"],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyUSB0", "speed": 115200}
+      },
       "from_spider": {
           "driver": "subt.pull:Pull",
           "init": {
