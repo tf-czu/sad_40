@@ -13,9 +13,11 @@ class Arecont(Node):
         super().__init__(config, bus)
         bus.register('image')
         self.bus = bus
-        self.set_camera()
+        self.continuously = config.get("continuously", False)
+        self.timeout = config.get("timeout", 0.2)
         self.work_dir = None
         self.url = "http://192.168.1.36/img.jpg"
+        self.set_camera()
 
     def set_camera(self):
         pass
@@ -43,6 +45,17 @@ class Arecont(Node):
 
 
     def update(self):
+        if self.continuously:
+            try:
+                with urllib.request.urlopen(self.url, timeout=0.5) as f:
+                    data = f.read()
+                if len(data) > 0:
+                    self.publish("image", data)
+            except socket.timeout:
+                pass
+            self.sleep(self.timeout)
+            return
+
         timestamp, channel, data = self.listen()
         if channel == "work_dir":
             self.work_dir = data
