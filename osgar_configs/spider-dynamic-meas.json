@@ -24,8 +24,14 @@
       "imu": {
           "driver": "imu",
           "in": ["raw"],
-          "out": ["orientation", "rotation"],
+          "out": ["orientation", "rotation", "data"],
           "init": {}
+      },
+      "localization": {
+	      "driver": "subt.odoimuloc:Localization",
+	      "in": ["orientation", "odom"],
+	      "out": ["pose3d"],
+	      "init":{}
       },
       "imu_serial": {
           "driver": "serial",
@@ -47,8 +53,12 @@
               ["can.raw", "serial.raw"],
               ["imu_serial.raw", "imu.raw"],
 
+              ["spider.pose2d", "localization.odom"],
+              ["imu.orientation", "localization.orientation"],
+
               ["spider.pose2d", "to_icp.pose2d"],
-              ["imu.rotation", "to_icp.rotation"]
+              ["imu.rotation", "to_icp.rotation"],
+              ["localization.pose3d", "to_icp.pose3d"]
     ]
   }
 }
