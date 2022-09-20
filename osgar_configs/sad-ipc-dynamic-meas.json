@@ -45,6 +45,12 @@
           "continuously": true
         }
       },
+      "basler_camera": {
+          "driver": "basler_camera:BaslerCamera",
+          "init": {
+            "address": "192.168.1.100"
+          }
+      },
       "ultrasonic_serial": {
           "driver": "serial",
           "in": ["raw"],
