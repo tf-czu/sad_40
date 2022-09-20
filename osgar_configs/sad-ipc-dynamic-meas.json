@@ -49,7 +49,7 @@
           "driver": "serial",
           "in": ["raw"],
           "out": ["raw"],
-          "init": {"port": "/dev/ttyUSB0", "speed": 115200}
+          "init": {"port": "/dev/ttyACM0", "speed": 115200}
       },
       "from_spider": {
           "driver": "subt.pull:Pull",
@@ -62,7 +62,8 @@
     },
     "links": [
       ["gps_serial.raw", "gps.raw"],
-      ["lidar_tcp.raw", "lidar.raw"]
+      ["lidar_tcp.raw", "lidar.raw"],
+      ["lidar.raw", "lidar_tcp.raw"]
     ]
   }
 }
