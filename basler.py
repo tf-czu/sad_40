@@ -46,8 +46,7 @@ class BaslerCamera:
 
     def run_input(self):
         self.cam.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
-        while self.bus.is_alive():
-            assert self.cam.IsGrabbing()
+        while self.bus.is_alive() and self.cam.IsGrabbing():
             try:
                 result = self.cam.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
                 if result.GrabSucceeded():
