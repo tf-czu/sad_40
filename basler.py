@@ -11,7 +11,7 @@ class BaslerCamera:
     def __init__(self, config, bus):
         self.input_thread = Thread(target=self.run_input, daemon=True)
         self.bus = bus
-        self.bus.register('image', 'metadata')
+        self.bus.register('picture', 'metadata')
         self.address = config.get("address", False)
 
         tlf = pylon.TlFactory.GetInstance()
