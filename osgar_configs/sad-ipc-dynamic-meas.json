@@ -46,16 +46,10 @@
         }
       },
       "basler_camera": {
-          "driver": "basler_camera:BaslerCamera",
+          "driver": "basler:BaslerCamera",
           "init": {
             "address": "192.168.1.100"
           }
-      },
-      "ultrasonic_serial": {
-          "driver": "serial",
-          "in": ["raw"],
-          "out": ["raw"],
-          "init": {"port": "/dev/ttyACM0", "speed": 115200}
       },
       "from_spider": {
           "driver": "subt.pull:Pull",
