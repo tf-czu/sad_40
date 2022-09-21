@@ -3,7 +3,7 @@
   "robot": {
     "modules": {
       "basler_camera": {
-          "driver": "basler_camera:BaslerCamera",
+          "driver": "basler:BaslerCamera",
           "init": {
             "address": "192.168.1.100"
           }
