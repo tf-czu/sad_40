@@ -146,7 +146,7 @@ class BaslerCameraOnce(Node):
                 short_name = "im_basler_EV{}.tiff".format(ii)
                 long_name = os.path.join(save_path, short_name)
                 picture = self.take_pic(long_name)
-                if picture and ev == 1:
+                if picture is not None and ev == 1:
                     self.bus.publish("picture", picture)
 
                 metadata["pictures"][short_name] = {
