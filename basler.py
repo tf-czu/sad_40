@@ -99,6 +99,10 @@ class BaslerCameraOnce(Node):
         self.expo_value = -1
         self.set_exposure()
 
+        self.converter = pylon.ImageFormatConverter()
+        self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+        self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+
 
     def set_exposure(self):
         """ Wait till exposure is adapted - timeout is 20 seconds.
