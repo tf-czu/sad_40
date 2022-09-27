@@ -32,7 +32,7 @@ class ControlStatic:
     def pull_data(self):
         if not self.runnig:
             return
-        if self.images and self.counter < 20:
+        if self.images and self.counter < 30:
             print("pull")
             for prev_name in self.images.copy():
                 data = getattr(self.server, prev_name)
