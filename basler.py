@@ -99,9 +99,11 @@ class BaslerCameraOnce(Node):
         self.bus.register('picture:null')
         self.bus.register('metadata')
 
-        self.expo_value = -1
         if self.auto_expo:
+            self.expo_value = -1
             self.set_exposure()
+        else:
+            self.expo_value = exposure_time_abs
 
         self.converter = pylon.ImageFormatConverter()
         self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
