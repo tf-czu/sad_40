@@ -46,7 +46,7 @@
       },
       "arduinno": {
         "driver": "serial",
-        "init": {"port": "/dev/ttyACM0", "speed": 115200}
+        "init": {"port": "/dev/ttyACM0", "speed": 9600}
       }
     },
     "links": [
