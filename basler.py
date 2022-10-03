@@ -72,6 +72,9 @@ class BaslerCameraOnce(Node):
     def __init__(self, config, bus):
         super().__init__(config, bus)
         self.address = config.get("address", False)
+        self.auto_expo = config.get("auto_expo", True)
+        exposure_time_abs = config.get("exposure_time_abs", 170_000)
+        gain_raw = config.get("gain_raw", 34)
         tlf = pylon.TlFactory.GetInstance()
         if not self.address:
             self.cam = pylon.InstantCamera(tlf.CreateFirstDevice())
@@ -88,16 +91,17 @@ class BaslerCameraOnce(Node):
         self.cam.Open()
 
         self.cam.ExposureAuto.SetValue('Off')
-        self.cam.ExposureTimeAbs.SetValue(170_000)
+        self.cam.ExposureTimeAbs.SetValue(exposure_time_abs)
         self.cam.GainAuto.SetValue("Off")
-        self.cam.GainRaw.SetValue(34)
+        self.cam.GainRaw.SetValue(gain_raw)
 
 
         self.bus.register('picture:null')
         self.bus.register('metadata')
 
         self.expo_value = -1
-        self.set_exposure()
+        if self.auto_expo:
+            self.set_exposure()
 
         self.converter = pylon.ImageFormatConverter()
         self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
@@ -137,6 +141,9 @@ class BaslerCameraOnce(Node):
             return
         # data = "/home/ovosad/ovosad_data/test_basler_02"
         save_path = data
+
+        if self.auto_expo:
+            self.set_exposure()
 
         metadata = {"pictures": {}}
         ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
