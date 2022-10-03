@@ -34,9 +34,11 @@ class BaslerCamera:
         self.cam.Open()
 
         self.cam.ExposureAuto.SetValue('Continuous')
+        # self.cam.AutoFunctionProfile.SetValue("MinimizeExposureTime")
+
         # self.cam.ExposureTimeAbs.SetValue(170_000)
-        # self.cam.GainAuto.SetValue("Off")
-        # self.cam.GainRaw.SetValue(34)
+        self.cam.GainAuto.SetValue("Off")
+        self.cam.GainRaw.SetValue(255)
 
         self.converter = pylon.ImageFormatConverter()
         self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
