@@ -12,11 +12,27 @@ import numpy as np
 DATA_PATH = "mech_properties/data"
 DATA_FILE = "otlaky-data-22.csv"
 
+E_45 = 0.119 # J, kinetic energy during impact (angle 45 deg.)
+E_75 = 0.301 # J, kinetic energy during impact (angle 75 deg.)
+HEADER = ["Label", "hmotnost (g)", "sirka (mm)", "sirka (mm)", "vyska (mm)", "Ek", "c11", "c12", "c21", "c22"]
+
+
+def refl2E(Ek, ratio):
+    if Ek == E_45:
+        a = 45
+    else:
+        a = 75
+    da = a*ratio
+    assert da < a, [Ek, a, ratio]
+    print(da, ratio)
+    return (1-np.cos(np.deg2rad(da))) / (1-np.cos(np.deg2rad(a)))
+
 
 def write_new_csv(data):
     file_name = os.path.join(DATA_PATH, "otlaky-data-kyvadlo.csv")
     with open(file_name, "w") as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
+        csv_writer.writerow(HEADER)
         for row in data:
             csv_writer.writerow(row)
 
@@ -54,13 +70,15 @@ def pendulum_reflection(file_name, debug = False, n = 3):
     b2_y1, b2_y2, b2_x1, b2_x2 = get_break_points(beat_2, n = n)
 
     if debug:
+        print(b1_y1, b1_y2, b1_x1, b1_x2)
+        print(b2_y1, b2_y2, b2_x1, b2_x2)
         plt.plot(beat_1, "k")
         plt.plot([b1_x1, b1_x2], [b1_y1, b1_y2], "ko")
         plt.plot(beat_2, "r")
         plt.plot([b2_x1, b2_x2], [b2_y1, b2_y2], "ro")
         plt.show()
 
-    return b1_y2/b1_y1, b2_y2/b2_y1  # reflection ratio
+    return abs((b1_y1 - b1_y2) / b1_y1), abs((b2_y1 - b2_y2)/b2_y1)  # reflection ratio
 
 
 def get_file_name(key_string, file_list):
@@ -98,6 +116,11 @@ def main():
     for apple in main_data_in:  # One item represents data from one apple.
         label = apple[0]
         print(label)
+        apple_num = int(label[1:])
+        if apple_num <= 10:
+            Ek = E_75
+        else:
+            Ek = E_45
         # Find two relevant file names
         key_string1 = f"{label[0].lower()}_{label[1:]}_1"
         key_string2 = f"{label[0].lower()}_{label[1:]}_2"
@@ -105,6 +128,7 @@ def main():
         pendulum1_fn = get_file_name(key_string1, file_list)
         pendulum2_fn = get_file_name(key_string2, file_list)
         #if ii % 10 != 0:
+        # Exceptions
         if label in ["F20", "G08", "I09", "K05", "K06"]:
             debug = True
         else:
@@ -116,8 +140,14 @@ def main():
             n1 = 5
         b1_ratio_1, b1_ratio_2 = pendulum_reflection(pendulum1_fn, debug = debug, n = n1)
         b2_ratio_1, b2_ratio_2 = pendulum_reflection(pendulum2_fn, debug = debug, n = n2)
-        main_data_out.append(apple + [b1_ratio_1, b1_ratio_2, b2_ratio_1, b2_ratio_2])
 
+        main_data_out.append(apple + [Ek,
+                                      refl2E(Ek, b1_ratio_1),
+                                      refl2E(Ek, b1_ratio_2),
+                                      refl2E(Ek, b2_ratio_1),
+                                      refl2E(Ek, b2_ratio_2)
+                                      ]
+                             )
         ii += 1
 
     write_new_csv(main_data_out)
