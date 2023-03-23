@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "realsense": {
+        "driver": "realsense",
+        "init": {
+            "device": "D400",
+            "depth_subsample": 1,
+            "depth_rgb": true,
+            "depth_resolution": [848, 480],
+            "rgb_resolution": [848, 480],
+            "depth_fps": 5,
+            "serial_number": "046122250990"
+          }
+      },
+      "gps": {
+          "driver": "gps",
+          "in": ["raw"],
+          "out": ["position"],
+          "init": {}
+      },
+      "gps_serial": {
+          "driver": "serial",
+          "in": [],
+          "out": ["raw"],
+          "init": {"port": "/dev/ttyS0", "speed": 4800}
+      },
+      "lidar": {
+          "driver": "lidar",
+          "in": ["raw"],
+          "out": ["raw", "scan"],
+          "init": {"sleep": 0.06, "blind_zone": 100}
+      },
+      "lidar_tcp": {
+          "driver": "tcp",
+          "in": ["raw"],
+          "out": ["raw"],
+          "init": {"host": "192.168.1.71", "port": 2111, "timeout": 0.5}
+      },
+      "arecont": {
+        "driver": "arecont:Arecont",
+        "out": "image",
+        "init": {
+          "continuously": true
+        }
+      },
+      "basler_camera": {
+          "driver": "basler:BaslerCamera",
+          "init": {
+            "address": "192.168.1.100"
+          }
+      },
+      "from_spider": {
+          "driver": "subt.pull:Pull",
+          "init": {
+            "endpoint": "tcp://192.168.1.17:5555",
+            "outputs": ["pose2d", "rotation", "pose3d"]
+          }
+      }
+
+    },
+    "links": [
+      ["gps_serial.raw", "gps.raw"],
+      ["lidar_tcp.raw", "lidar.raw"],
+      ["lidar.raw", "lidar_tcp.raw"]
+    ]
+  }
+}
