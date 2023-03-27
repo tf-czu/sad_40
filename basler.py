@@ -151,6 +151,7 @@ class BaslerCameraOnce(Node):
 
         metadata = {"pictures": {}}
         ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
+        pic2publish = None
         for ii, ev in enumerate(ev_values):
             try:
                 self.cam.ExposureTimeAbs.SetValue(self.expo_value * ev)
@@ -158,7 +159,7 @@ class BaslerCameraOnce(Node):
                 long_name = os.path.join(save_path, short_name)
                 picture = self.take_pic(long_name)
                 if picture is not None and ev == 1:
-                    self.bus.publish("picture", picture)
+                    pic2publish = picture
 
                 metadata["pictures"][short_name] = {
                     "path": str(long_name),
@@ -173,6 +174,7 @@ class BaslerCameraOnce(Node):
                     pass
 
         self.bus.publish("metadata", json.dumps(metadata))
+        self.bus.publish("picture", pic2publish)
 
         meta_path = os.path.join(save_path, "basler_meta.json")
         with open(meta_path, "w") as f:

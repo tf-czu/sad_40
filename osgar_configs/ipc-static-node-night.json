@@ -40,7 +40,7 @@
           "init": {
             "address": "192.168.1.100",
             "auto_expo": false,
-            "exposure_time_abs": 170000,
+            "exposure_time_abs": 120000,
             "gain_raw": 34
           }
       },
