@@ -24,10 +24,23 @@ class ControlStatic:
         self.prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev"]
         self.counter = 0
         self.runnig = False
+        self.last_label = ""
+        self.reverse_direction = False
         self.exit_event = Event()
         for name in self.prev_images:
             setattr(self, name, None)
 
+    def set_label(self):
+        last_label = self.last_label
+        reverse_direction = app.getCheckBox("Reverse")
+        assert len(last_label) > 3, last_label
+        num_part = last_label[-3:]  # max number is 999
+        assert num_part.isnumeric(), num_part
+        if reverse_direction == True:
+            new_num = max(0, int(num_part) - 1)
+        else:
+            new_num = min(999, int(num_part) + 1)
+        app.setEntry("label", f"{last_label[:-3]}{new_num:03d}")
 
     def pull_data(self):
         if not self.runnig:
@@ -53,6 +66,7 @@ class ControlStatic:
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             self.counter = 0
+            self.set_label()
             self.runnig = False
 
 
@@ -61,6 +75,7 @@ class ControlStatic:
             return
         self.images = self.prev_images.copy()
         label = app.getEntry("label")
+        self.last_label = label
         if self.thread is not None:
             self.thread.join(2)
 
@@ -73,13 +88,12 @@ class ControlStatic:
     def main(self):
         app.setResizable(canResize=False)
         app.setTitle("Sad 4.0")
-
-
         app.setSticky("news")
         app.addEntry("label", row=0, column=0)
         # app.setEntry("label", "labell")
         app.addButton("measure_button", self.on_button_measure, row=0, column=1)
         app.setButton("measure_button", "Measure")
+        app.addCheckBox("Reverse", row=1, column=1)
 
         app.go()
 
