@@ -13,7 +13,7 @@ import cv2
 class MeasureNode(Node):
     def __init__(self, config, bus):
         super().__init__(config, bus)
-        bus.register('work_dir', "arecont_prev", "basler_prev", "rs_prev", "depth_prev")
+        bus.register('work_dir', "arecont_prev", "basler_prev", "rs_prev", "depth_prev", "route_prev")
         self.control_msg = None
         self.bus = bus
         self.storage_path = config.get("storage_path", "/home/ovosad/ovosad_data")
@@ -23,6 +23,7 @@ class MeasureNode(Node):
         self.basler_image = None
         self.rs_image = None
         self.rs_depth = None
+        self.route_image = None
 
 
     def make_dir(self, label):
@@ -71,6 +72,9 @@ class MeasureNode(Node):
                 elif self.rs_depth is not None:
                     self.publish("depth_prev", self.process_depth(self.rs_depth))
                     self.rs_depth = None
+                elif self.arecont_image is not None:
+                    self.publish("route_prev", self.process_image(self.route_image))
+                    self.route_image = None
 
 
         except BusShutdownException:
