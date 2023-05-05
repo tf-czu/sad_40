@@ -21,7 +21,7 @@ class ControlStatic:
         self.server = ZmqPull()
         self.thread = None
         app.registerEvent(self.pull_data)
-        self.prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev"]
+        self.prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev", "route_prev"]
         self.counter = 0
         self.runnig = False
         self.last_label = ""
