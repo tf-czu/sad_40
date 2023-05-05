@@ -72,7 +72,7 @@ class MeasureNode(Node):
                 elif self.rs_depth is not None:
                     self.publish("depth_prev", self.process_depth(self.rs_depth))
                     self.rs_depth = None
-                elif self.arecont_image is not None:
+                elif self.route_image is not None:
                     self.publish("route_prev", self.process_image(self.route_image))
                     self.route_image = None
 
