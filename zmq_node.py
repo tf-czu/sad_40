@@ -17,6 +17,7 @@ class ZmqPull:
         self.arecont_prev = None
         self.rs_prev = None
         self.depth_prev = None
+        self.route_prev = None
 
 
     def pull_msg(self):
