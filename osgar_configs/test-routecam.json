@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "camera": {
+          "driver": "routecam:RouteCam",
+          "in": [],
+          "out": ["frame"],
+          "init": {
+              "rtsp_url": "rtsp://192.168.1.55:5005/routecam",
+              "subsample": 5
+          }
+      }
+    },
+    "links": []
+  }
+}
