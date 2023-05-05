@@ -1,6 +1,7 @@
 """
     TODO
 """
+import cv2
 from osgar.node import Node
 
 
