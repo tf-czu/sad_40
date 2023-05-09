@@ -47,6 +47,19 @@
       "arduinno": {
         "driver": "serial",
         "init": {"port": "/dev/ttyACM0", "speed": 9600}
+      },
+      "route_cam": {
+        "driver": "routecam:RouteCam",
+          "in": [],
+          "out": ["frame"],
+          "init": {
+              "rtsp_url": "rtsp://192.168.1.55:5005/routecam",
+              "subsample": 5
+          }
+      },
+      "routecam_node": {
+        "driver": "routecam_node:RouteCamNode",
+        "init": {}
       }
     },
     "links": [
@@ -61,10 +74,15 @@
       ["measure_node.work_dir", "basler_camera.work_dir"],
       ["basler_camera.picture", "measure_node.basler_image"],
 
+      ["route_cam.frame", "routecam_node.frame"],
+      ["measure_node.work_dir", "routecam_node.work_dir"],
+      ["routecam_node.image", "measure_node.route_image"],
+
       ["measure_node.arecont_prev", "to_control.arecont_prev"],
       ["measure_node.basler_prev", "to_control.basler_prev"],
       ["measure_node.rs_prev", "to_control.rs_prev"],
-      ["measure_node.depth_prev", "to_control.depth_prev"]
+      ["measure_node.depth_prev", "to_control.depth_prev"],
+      ["measure_node.route_prev", "to_control.route_prev"]
     ]
   }
 }

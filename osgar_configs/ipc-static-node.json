@@ -53,6 +53,10 @@
       "routecam_node": {
         "driver": "routecam_node:RouteCamNode",
         "init": {}
+      },
+      "arduinno": {
+        "driver": "serial",
+        "init": {"port": "/dev/ttyACM0", "speed": 9600}
       }
     },
 

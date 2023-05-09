@@ -29,4 +29,3 @@ class RouteCamNode(Node):
 
     def on_work_dir(self, data):
         self.work_dir = data
-        
