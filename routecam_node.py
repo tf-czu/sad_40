@@ -2,6 +2,7 @@
     TODO
 """
 import cv2
+import os
 from osgar.node import Node
 
 

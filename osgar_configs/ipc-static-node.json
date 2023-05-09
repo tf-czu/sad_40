@@ -70,7 +70,7 @@
 
       ["route_cam.frame", "routecam_node.frame"],
       ["measure_node.work_dir", "routecam_node.work_dir"],
-      ["routecam_node.image", "measure_node.routecam_image"],
+      ["routecam_node.image", "measure_node.route_image"],
 
       ["measure_node.arecont_prev", "to_control.arecont_prev"],
       ["measure_node.basler_prev", "to_control.basler_prev"],
