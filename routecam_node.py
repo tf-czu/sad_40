@@ -29,13 +29,4 @@ class RouteCamNode(Node):
 
     def on_work_dir(self, data):
         self.work_dir = data
-
-    def update(self):
-        timestamp, channel, data = self.bus.listen()
-        self.time = timestamp
-        handler = getattr(self, "on_" + channel, None)
-        if handler is not None:
-            handler(data)
-        else:
-            assert False, channel  # unknown
-        return channel
+        
