@@ -54,9 +54,13 @@
         "driver": "routecam_node:RouteCamNode",
         "init": {}
       },
-      "arduinno": {
+      "serial": {
         "driver": "serial",
         "init": {"port": "/dev/ttyACM0", "speed": 9600}
+      },
+      "arduino": {
+        "driver": "arduino_sensors:ArduinoSensors",
+        "init": {}
       }
     },
 
@@ -80,7 +84,11 @@
       ["measure_node.basler_prev", "to_control.basler_prev"],
       ["measure_node.rs_prev", "to_control.rs_prev"],
       ["measure_node.depth_prev", "to_control.depth_prev"],
-      ["measure_node.route_prev", "to_control.route_prev"]
+      ["measure_node.route_prev", "to_control.route_prev"],
+
+      ["serial.raw", "arduino.raw"],
+      ["arduino.trig", "serial.raw"],
+      ["measure_node.work_dir", "arduino.work_dir"]
     ]
   }
 }
