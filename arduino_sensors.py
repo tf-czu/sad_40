@@ -12,6 +12,8 @@ class ArduinoSensors(Node):
         self.bus = bus
         self.work_dir = None
         self.buf = b""
+        # switch arduino to trigger mode
+        self.publish("trig", b"\r\n")
 
     def save_data(self, data):
         assert self.work_dir is not None
@@ -26,7 +28,7 @@ class ArduinoSensors(Node):
     def on_raw(self, data):
         if self.work_dir:
             self.buf += data
-            if b"/n" in self.buf:
+            if b"\n" in self.buf:
                 self.save_data(self.buf.decode())
                 self.work_dir = None
                 self.buf = b""
