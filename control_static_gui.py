@@ -68,6 +68,7 @@ class ControlStatic:
             self.counter = 0
             self.set_label()
             self.runnig = False
+            print("-----")
 
 
     def on_button_measure(self):
