@@ -148,9 +148,12 @@ class BaslerCameraOnce(Node):
 
         if self.auto_expo:
             self.set_exposure()
+            ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
+        else:
+            ev_values = [1]
 
         metadata = {"pictures": {}}
-        ev_values = [1, 0.5, 0.25, 0.125, 2, 4, 8]
+
         pic2publish = None
         for ii, ev in enumerate(ev_values):
             try:
