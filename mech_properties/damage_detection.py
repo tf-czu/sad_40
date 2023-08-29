@@ -77,7 +77,8 @@ def calculate_areas(points, im):
         assert len(contours) == 1
         cnt = contours[0]
         area = cv2.contourArea(cnt)
-        ret.append([area, cnt])
+        color = np.mean(im[mask], 0)
+        ret.append([area, cnt, color])
 
     return ret
 
@@ -111,7 +112,7 @@ class ImageProcessing:
                 cv2.drawMarker(im_to_show, p, (255, 0, 0), cv2.MARKER_CROSS, markerSize=30, thickness=4)
             cv2.putText(im_to_show, f"{label}, {im_id}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, fontScale=3, color=(255, 0, 0), thickness=5)
             for r in res:
-                area, cnt = r
+                area, cnt, __ = r
                 cv2.drawContours(im_to_show, [cnt], -1, (255, 0, 0), 2)
 
             cv2.imshow("win", im_to_show)
@@ -125,9 +126,8 @@ class ImageProcessing:
             if k == ord("c"):
                 if len(points) == 8:
                     scale = get_scale(img)
-                    (area1, cnt1), (area2, cnt2) = calculate_areas(points, im_to_show)
-                    res = (area1*scale, cnt1), (area2*scale, cnt2)
-                    # TODO colour
+                    (area1, cnt1, color1), (area2, cnt2, color2) = calculate_areas(points, im_to_show)
+                    res = (area1*scale, cnt1, color1), (area2*scale, cnt2, color2)
 
             if k == ord("d"):  # delete points
                 points = []
@@ -167,10 +167,10 @@ def main_processing(img_path, dict_path):
     csv_filename = datetime.datetime.now().strftime("apple_%y%m%d_%H%M%S.csv")
     with open(csv_filename, "w", newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=",")
-        csv_writer.writerow(["label", "apple ID", "variety", "repetition", "area (mm2)"])
+        csv_writer.writerow(["label", "apple ID", "variety", "repetition", "area (mm2)", "r", "g", "b"])
         for label, variety, im_id, img, points, res in data:
-            for ii, (area, cnt) in enumerate(res):
-                csv_writer.writerow([label, im_id, variety, ii+1, area])
+            for ii, (area, cnt, (b, g, r)) in enumerate(res):
+                csv_writer.writerow([label, im_id, variety, ii+1, area, r, g, b])
 
 
 
