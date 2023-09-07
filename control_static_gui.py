@@ -21,7 +21,7 @@ class ControlStatic:
         self.server = ZmqPull()
         self.thread = None
         app.registerEvent(self.pull_data)
-        self.prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev"]
+        self.prev_images = ["basler_prev", "arecont_prev", "rs_prev", "depth_prev", "route_prev"]
         self.counter = 0
         self.runnig = False
         self.last_label = ""
@@ -45,7 +45,7 @@ class ControlStatic:
     def pull_data(self):
         if not self.runnig:
             return
-        if self.images and self.counter < 30:
+        if self.images and self.counter < 60:
             print("pull")
             for prev_name in self.images.copy():
                 data = getattr(self.server, prev_name)
@@ -68,6 +68,7 @@ class ControlStatic:
             self.counter = 0
             self.set_label()
             self.runnig = False
+            print("-----")
 
 
     def on_button_measure(self):
