@@ -53,10 +53,6 @@
       }
 
     },
-    "links": [
-      ["gps_serial.raw", "gps.raw"],
-      ["lidar_tcp.raw", "lidar.raw"],
-      ["lidar.raw", "lidar_tcp.raw"]
-    ]
+    "links": []
   }
 }
