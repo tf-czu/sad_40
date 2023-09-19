@@ -26,6 +26,8 @@ class FollowTrees(Node):
     def on_scan(self, data):
         self.scan = data
         desired_direction = normalizeAnglePIPI(follow_wall_angle(self.scan, gap_size=3, wall_dist=1.5, right_wall=True))
-        assert desired_direction is None
-        self.go_safely(desired_direction)
+        if desired_direction is not None:
+            self.go_safely(desired_direction)
+        else:
+            self.send_speed(0, 0)
 
