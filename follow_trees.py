@@ -11,7 +11,7 @@ from osgar.lib.mathex import normalizeAnglePIPI
 class FollowTrees(Node):
     def __init__(self, config, bus):
         super().__init__(config, bus)
-        bus.register("desired_speed", "scan")
+        bus.register("move")
         self.bus = bus
         self.max_speed = config.get("max_speed", 0.3)
         self.scan = None
