@@ -94,6 +94,13 @@
               "port": 10001,
               "bufsize": 2000
         }
+      },
+      "to_icp": {
+        "driver": "subt.push:Push",
+        "init": {
+          "bind": true,
+          "endpoint": "tcp://*:5555"
+        }
       }
 
     },
@@ -116,7 +123,13 @@
               ["gps_tcp.raw", "gps.raw"],
               ["gps_tcp.raw", "rtk_filter.nmea"],
               ["rtk_filter.filtered", "rtk_modem.raw"],
-              ["rtk_modem.raw", "gps_tcp.raw"]
+              ["rtk_modem.raw", "gps_tcp.raw"],
+
+              ["spider.pose2d", "to_icp.pose2d"],
+              ["imu.rotation", "to_icp.rotation"],
+              ["localization.pose3d", "to_icp.pose3d"],
+              ["lidar.scan", "to_ipc.scan"],
+              ["gps.position", "to_ipc.position"]
 
     ]
   }

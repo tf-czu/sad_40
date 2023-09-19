@@ -2,42 +2,30 @@
   "version": 2,
   "robot": {
     "modules": {
-      "realsense": {
-        "driver": "realsense",
-        "init": {
-            "device": "D400",
-            "depth_subsample": 1,
-            "depth_rgb": true,
-            "depth_resolution": [848, 480],
-            "rgb_resolution": [848, 480],
-            "depth_fps": 5,
-            "serial_number": "046122250990"
+      "oak_camera": {
+          "driver": "osgar.drivers.oak_camera:OakCamera",
+          "init": {
+            "fps": 5,
+            "is_color": true,
+            "is_depth": true,
+            "laser_projector_current": 1200,
+            "is_imu_enabled": true,
+            "number_imu_records": 20,
+            "disable_magnetometer_fusion": true,
+            "cam_ip": "192.168.1.53",
+
+            "mono_resolution": "THE_400_P",
+            "color_resolution": "THE_1080_P",
+            "color_manual_focus": null,
+
+            "stereo_median_filter": "KERNEL_3x3",
+            "stereo_mode": "HIGH_ACCURACY",
+            "stereo_extended_disparity": false,
+            "stereo_subpixel": true,
+            "stereo_left_right_check": true
           }
       },
-      "gps": {
-          "driver": "gps",
-          "in": ["raw"],
-          "out": ["position"],
-          "init": {}
-      },
-      "gps_serial": {
-          "driver": "serial",
-          "in": [],
-          "out": ["raw"],
-          "init": {"port": "/dev/ttyS0", "speed": 4800}
-      },
-      "lidar": {
-          "driver": "lidar",
-          "in": ["raw"],
-          "out": ["raw", "scan"],
-          "init": {"sleep": 0.06, "blind_zone": 100}
-      },
-      "lidar_tcp": {
-          "driver": "tcp",
-          "in": ["raw"],
-          "out": ["raw"],
-          "init": {"host": "192.168.1.71", "port": 2111, "timeout": 0.5}
-      },
+
       "arecont": {
         "driver": "arecont:Arecont",
         "out": "image",
@@ -55,7 +43,7 @@
           "driver": "subt.pull:Pull",
           "init": {
             "endpoint": "tcp://192.168.1.17:5555",
-            "outputs": ["pose2d", "rotation", "pose3d"]
+            "outputs": ["pose2d", "rotation", "pose3d", "scan", "position"]
           }
       }
 
