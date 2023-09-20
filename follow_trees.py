@@ -17,7 +17,8 @@ class FollowTrees(Node):
         self.scan = None
 
     def send_speed(self, speed, desired_direction):
-        return self.publish('move', [round(speed * 1000), round(math.degrees(desired_direction) * 100)])
+        # reverse direction
+        return self.publish('move', [round(-speed * 1000), round(math.degrees(-desired_direction) * 100)])
 
     def go_safely(self, desired_direction):
         # TODO stop if a obstacle is too close.
