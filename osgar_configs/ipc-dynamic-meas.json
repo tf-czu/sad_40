@@ -37,7 +37,7 @@
       "route_cam": {
         "driver": "routecam:RouteCam",
           "in": [],
-          "out": ["frame"],
+          "out": ["image"],
           "init": {
               "rtsp_url": "rtsp://192.168.1.55:5005/routecam",
               "subsample": 5

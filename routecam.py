@@ -9,7 +9,7 @@ class RouteCam:
     def __init__(self, config, bus):
         self.input_thread = Thread(target=self.run_input, daemon=True)
         self.bus = bus
-        bus.register('frame')
+        bus.register('image')
         self.subsample = config.get('subsample', 1)
         rtsp_url = config.get("rtsp_url", "rtsp://192.168.1.55:5005/routecam")
         self.cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
@@ -33,7 +33,7 @@ class RouteCam:
             if ret and counter == self.subsample:
                 retval, data = cv2.imencode('*.jpeg', frame)
                 if len(data) > 0:
-                    self.bus.publish('frame', data.tobytes())
+                    self.bus.publish('image', data.tobytes())
                 counter = 0
         self.cap.release()
 
