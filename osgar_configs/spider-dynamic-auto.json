@@ -98,6 +98,11 @@
               "bufsize": 2000
         }
       },
+      "arduino_serial": {
+        "driver": "serial",
+        "init": {"port": "/dev/ttyACM0", "speed": 9600}
+      },
+
       "to_ipc": {
         "driver": "subt.push:Push",
         "init": {
