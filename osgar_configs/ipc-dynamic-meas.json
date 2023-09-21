@@ -43,6 +43,12 @@
               "subsample": 5
           }
       },
+      "qrdetec": {
+        "driver": "qrdetec:QrDetec",
+        "in": ["image"],
+        "out":["qr_data"],
+        "init": {}
+      },
 
       "from_spider": {
           "driver": "subt.pull:Pull",
@@ -53,6 +59,8 @@
       }
 
     },
-    "links": []
+    "links": [
+      ["route_cam.image", "qrdetec.image"]
+    ]
   }
 }
