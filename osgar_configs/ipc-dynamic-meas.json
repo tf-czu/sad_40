@@ -49,6 +49,10 @@
         "out":["qr_data"],
         "init": {}
       },
+      "arduino_serial": {
+        "driver": "serial",
+        "init": {"port": "/dev/ttyACM0", "speed": 9600}
+      },
 
       "from_spider": {
           "driver": "subt.pull:Pull",
