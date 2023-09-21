@@ -25,7 +25,10 @@
         "driver": "follow_trees:FollowTrees",
         "in": ["scan"],
         "out": ["move"],
-        "init": {"max_speed": 0.4}
+        "init": {
+          "max_speed": 0.4,
+          "local_planner": true
+        }
       },
 
       "imu": {
@@ -55,7 +58,7 @@
           "driver": "lidar",
           "in": ["raw"],
           "out": ["raw", "scan"],
-          "init": {"sleep": 0.06, "blind_zone": 100, "mask": [30, -30]}
+          "init": {"sleep": 0.1, "blind_zone": 100, "mask": [30, -90]}
       },
       "lidar_tcp": {
           "driver": "tcp",
