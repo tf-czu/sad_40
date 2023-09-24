@@ -17,6 +17,7 @@ class FollowTrees(Node):
         self.max_speed = config.get("max_speed", 0.3)
         use_local_planner = config.get("local_planner", False)
         self.scan = None
+        self.verbose = False
         if use_local_planner:
             self.local_planner = LocalPlanner(
                 direction_adherence=math.radians(45),
@@ -40,12 +41,16 @@ class FollowTrees(Node):
         # data[-90:] = [0]*90
         self.scan = data
         safety = 1
-        desired_direction = normalizeAnglePIPI(follow_wall_angle(self.scan, gap_size=2, wall_dist=1, right_wall=True))
+        desired_direction = normalizeAnglePIPI(follow_wall_angle(self.scan, gap_size=1.5, wall_dist=1, right_wall=True))
         if desired_direction is not None:
             # print(self.time, desired_direction)
+            if self.verbose:
+                print("wall", self.time, desired_direction)
             if self.local_planner:
                 self.local_planner.update(data)
                 safety, desired_direction = self.local_planner.recommend(desired_direction)
+                if self.verbose:
+                    print("planner", desired_direction, "\n")
             # print("planer",safety, desired_direction, "\n")
             self.go_safely(desired_direction, safety)
         else:
