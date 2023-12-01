@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "dummy_record": {
+          "driver": "replay",
+          "init": {
+            "filename": "logs/spider/221011/sad-ipc-dynamic-meas-221011_195153.log",
+            "pins": {"lidar.scan": "scan"},
+            "sleep_channel": ["scan", 0.05]
+          }
+      },
+      "follow": {
+        "driver": "follow_trees:FollowTrees",
+        "init": {}
+      }
+    },
+    "links": [
+      ["dummy_record.scan", "follow.scan"]
+    ]
+  }
+}
