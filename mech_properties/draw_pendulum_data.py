@@ -32,3 +32,4 @@ def draw_data(data_path):
 
 if __name__ == "__main__":
     draw_data(sys.argv[1])
+    
