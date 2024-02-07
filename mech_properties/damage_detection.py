@@ -61,7 +61,8 @@ def get_circle(p1, p2, p3):
 
 def calculate_areas(points, im):
     ret = []
-    for ii in range(2):
+    # for ii in range(2):
+    for ii in range(1):
         im1 = np.zeros_like(im[:, :, 0])
         im2 = np.zeros_like(im[:, :, 0])
         im3 = np.zeros_like(im[:, :, 0])
@@ -92,7 +93,7 @@ class ImageProcessing:
         The function is called during all mouse events.
         """
         if event == cv2.EVENT_LBUTTONDOWN:
-            # print(x, y)
+            print(x, y)
             self.last_mpoint = (x, y)
 
 
@@ -109,25 +110,28 @@ class ImageProcessing:
             label, variety, im_id, img, points, res = data[ii]
             im_to_show = img.copy()
             for p in points:
-                cv2.drawMarker(im_to_show, p, (255, 0, 0), cv2.MARKER_CROSS, markerSize=30, thickness=4)
+                cv2.drawMarker(im_to_show, p, (255, 0, 0), cv2.MARKER_CROSS, markerSize=30, thickness=6)
             cv2.putText(im_to_show, f"{label}, {im_id}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, fontScale=3, color=(255, 0, 0), thickness=5)
             for r in res:
                 area, cnt, __ = r
-                cv2.drawContours(im_to_show, [cnt], -1, (255, 0, 0), 2)
+                cv2.drawContours(im_to_show, [cnt], -1, (255, 0, 0), 4)
 
             cv2.imshow("win", im_to_show)
             cv2.setMouseCallback('win', self.manual_label)
 
             k = cv2.waitKey(100) & 0xFF
-            if self.last_mpoint and len(points) < 8:
+            if self.last_mpoint and len(points) < 4:
                 points.append(self.last_mpoint)
                 self.last_mpoint = None
 
             if k == ord("c"):
-                if len(points) == 8:
+                if len(points) == 4:
                     scale = get_scale(img)
-                    (area1, cnt1, color1), (area2, cnt2, color2) = calculate_areas(points, im_to_show)
-                    res = (area1*scale, cnt1, color1), (area2*scale, cnt2, color2)
+                    print(scale)
+                    # (area1, cnt1, color1), (area2, cnt2, color2) = calculate_areas(points, im_to_show)
+                    print(calculate_areas(points, im_to_show))
+                    area1, cnt1, color1 = calculate_areas(points, im_to_show)[0]
+                    res = [(area1*scale, cnt1, color1)]  # , (area2*scale, cnt2, color2)
 
             if k == ord("d"):  # delete points
                 points = []
@@ -154,11 +158,15 @@ def main_processing(img_path, dict_path):
     data = []
     for label, variety in varieties_dict.items():
         assert label in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
-        im_dir = f"jabka_mech-prop-{label}"
+        # im_dir = f"jabka_mech-prop-{label}"
+        im_dir = f"{label}-jablka"
         variety_im_path = os.path.join(img_path, im_dir)
+        print(variety_im_path)
         img_list = sorted(os.listdir(variety_im_path))
         for ii, im_file in enumerate(img_list):
-            assert str(ii) in im_file
+            if label == "E" and ii == 0:
+                continue
+            assert str(ii+1) in im_file, (ii, im_file)
             im = cv2.imread(os.path.join(variety_im_path, im_file))
             data.append([label, variety, ii, im, [], []])  # the last variables are for label points and results
 
