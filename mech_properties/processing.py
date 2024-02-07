@@ -91,15 +91,16 @@ def load_data():
     # First load DATA_FILE as list
     main_data_in = []
     with open(os.path.join(DATA_PATH, DATA_FILE)) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter='\t')
+        csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
         for row in csv_reader:
             print(row)
             assert len(row) == 8
             label = row[0]
-            mass, height, d1, d2 = [float(num) for num in row[1:5]]
+            mass = float(row[1]) if row[1] else None
+            height, d1, d2 = [float(num) for num in row[2:5]]
             volume = float(row[5])/0.997 if row[5] else None  # water density is 0.997 g/cm**2
-            density =mass/volume if volume else None
+            density =mass/volume if (volume and mass) else None
 
             main_data_in.append([label, mass, height, d1, d2, volume, density])
 
