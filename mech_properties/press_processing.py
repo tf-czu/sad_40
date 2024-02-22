@@ -12,7 +12,7 @@ SMOOT_INTERVAL = 20
 
 def cut_data(time, force, positions):
     # touch detection
-    is_force_change = np.diff(force) < -0.1
+    is_force_change = np.diff(force) < -0.05
     assert True in is_force_change
     start = np.argmax(is_force_change)  # first true occurrence
     # detection of machine return
