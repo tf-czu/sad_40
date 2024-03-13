@@ -43,6 +43,15 @@
               "subsample": 5
           }
       },
+      "route_cam2": {
+        "driver": "routecam:RouteCam",
+          "in": [],
+          "out": ["image"],
+          "init": {
+              "rtsp_url": "rtsp://192.168.1.56:5005/routecam",
+              "subsample": 5
+          }
+      },
       "qrdetec": {
         "driver": "qrdetec:QrDetec",
         "in": ["image"],
@@ -58,7 +67,7 @@
           "driver": "subt.pull:Pull",
           "init": {
             "endpoint": "tcp://192.168.1.17:5555",
-            "outputs": ["pose2d", "rotation", "pose3d", "scan", "position"]
+            "outputs": ["pose2d", "rotation", "pose3d", "scan", "position", "lidar_scan"]
           }
       }
 
