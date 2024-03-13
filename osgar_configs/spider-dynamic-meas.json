@@ -117,7 +117,7 @@
               ["imu.rotation", "to_icp.rotation"],
               ["localization.pose3d", "to_icp.pose3d"],
               ["lidar.scan", "to_icp.lidar_scan"],
-              ["gps.position", "to_ipc.position"]
+              ["gps.position", "to_icp.position"]
     ]
   }
 }
