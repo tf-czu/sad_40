@@ -115,7 +115,8 @@
 
               ["spider.pose2d", "to_icp.pose2d"],
               ["imu.rotation", "to_icp.rotation"],
-              ["localization.pose3d", "to_icp.pose3d"]
+              ["localization.pose3d", "to_icp.pose3d"],
+              ["lidar.scan", "to_icp.lidar_scan"]
     ]
   }
 }
