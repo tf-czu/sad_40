@@ -49,7 +49,7 @@
           "out": ["image"],
           "init": {
               "rtsp_url": "rtsp://192.168.1.56:5005/routecam",
-              "subsample": 5
+              "subsample": 10
           }
       },
       "qrdetec": {
