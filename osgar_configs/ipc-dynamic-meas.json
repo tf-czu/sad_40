@@ -63,10 +63,6 @@
         "driver": "serial",
         "init": {"port": "/dev/ttyACM0", "speed": 9600}
       },
-      "arduino": {
-        "driver": "arduino_sensors:ArduinoContinuous",
-        "init": {}
-      },
 
       "from_spider": {
           "driver": "osgar.drivers.pull:Pull",
@@ -78,9 +74,7 @@
 
     },
     "links": [
-      ["route_cam.image", "qrdetec.image"],
-      ["arduino_serial.raw", "arduino.raw"],
-      ["arduino.trig", "arduino_serial.raw"]
+      ["route_cam.image", "qrdetec.image"]
     ]
   }
 }
