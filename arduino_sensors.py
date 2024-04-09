@@ -32,3 +32,14 @@ class ArduinoSensors(Node):
                 self.save_data(self.buf.decode())
                 self.work_dir = None
                 self.buf = b""
+
+class ArduinoContinuous(Node):
+    def __init__(self, config, bus):
+        super().__init__(config, bus)
+        bus.register('trig')
+        self.bus = bus
+
+    def update(self):
+        self.publish("trig", b"\r\n")
+        self.sleep(0.2)
+        # timestamp, channel, data = self.bus.listen()
