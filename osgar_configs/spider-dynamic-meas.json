@@ -28,37 +28,120 @@
           "init": {}
       },
       "localization": {
-	      "driver": "subt.odoimuloc:Localization",
+	      "driver": "osgar.drivers.odoimuloc:Localization",
 	      "in": ["orientation", "odom"],
 	      "out": ["pose3d"],
 	      "init":{}
       },
-      "imu_serial": {
-          "driver": "serial",
-          "in": [],
+      "imu_tcp": {
+          "driver": "tcp",
+          "in": ["raw"],
           "out": ["raw"],
-          "init": {"port": "/dev/ttyUSB0", "speed": 115200}
+          "init": {
+              "host": "192.168.1.12",
+              "port": 10002,
+              "bufsize": 2000
+          }
       },
       "to_icp": {
-        "driver": "subt.push:Push",
+        "driver": "osgar.drivers.push:Push",
         "init": {
           "bind": true,
           "endpoint": "tcp://*:5555"
         }
+      },
+
+      "lidar": {
+          "driver": "lidar",
+          "in": ["raw"],
+          "out": ["raw", "scan"],
+          "init": {"sleep": 0.1, "blind_zone": 100, "mask": [30, -30]}
+      },
+      "lidar_tcp": {
+          "driver": "tcp",
+          "in": ["raw"],
+          "out": ["raw"],
+          "init": {"host": "192.168.1.71", "port": 2111, "timeout": 0.5}
+      },
+
+      "gps_tcp": {
+          "driver": "tcp",
+          "in": ["raw"],
+          "out": ["raw"],
+          "init": {
+              "host": "192.168.1.12",
+              "port": 10001,
+              "bufsize": 2000
+          }
+      },
+      "gps": {
+        "driver": "gps",
+        "init": {}
+      },
+      "rtk_filter": {
+        "driver": "rtk_filter",
+          "in": ["nmea"],
+          "out": ["filtered"],
+          "init": {
+        }
+      },
+      "rtk_modem": {
+        "driver": "tcp",
+          "in": ["raw"],
+          "out": ["raw"],
+          "init": {
+              "host": "192.168.1.11",
+              "port": 10001,
+              "bufsize": 2000
+        }
+      },
+      "oak_camera": {
+          "driver": "osgar.drivers.oak_camera:OakCamera",
+          "init": {
+            "fps": 5,
+            "is_color": true,
+            "is_depth": true,
+            "laser_projector_current": 1200,
+            "is_imu_enabled": true,
+            "number_imu_records": 20,
+            "disable_magnetometer_fusion": true,
+            "cam_ip": "192.168.1.53",
+
+            "mono_resolution": "THE_720_P",
+            "color_resolution": "THE_1080_P",
+            "color_manual_focus": 130,
+            "color_manual_exposure": 1000,
+
+            "stereo_median_filter": "KERNEL_3x3",
+            "stereo_mode": "HIGH_ACCURACY",
+            "stereo_extended_disparity": false,
+            "stereo_subpixel": true,
+            "stereo_left_right_check": true
+          }
       }
     },
     "links": [["spider.can", "can.can"],
               ["can.can", "spider.can"],
               ["serial.raw", "can.raw"],
               ["can.raw", "serial.raw"],
-              ["imu_serial.raw", "imu.raw"],
+              ["imu_tcp.raw", "imu.raw"],
 
               ["spider.pose2d", "localization.odom"],
               ["imu.orientation", "localization.orientation"],
 
+              ["lidar_tcp.raw", "lidar.raw"],
+              ["lidar.raw", "lidar_tcp.raw"],
+
+              ["gps_tcp.raw", "gps.raw"],
+              ["gps_tcp.raw", "rtk_filter.nmea"],
+              ["rtk_filter.filtered", "rtk_modem.raw"],
+              ["rtk_modem.raw", "gps_tcp.raw"],
+
               ["spider.pose2d", "to_icp.pose2d"],
               ["imu.rotation", "to_icp.rotation"],
-              ["localization.pose3d", "to_icp.pose3d"]
+              ["localization.pose3d", "to_icp.pose3d"],
+              ["lidar.scan", "to_icp.lidar_scan"],
+              ["gps.position", "to_icp.position"]
     ]
   }
 }

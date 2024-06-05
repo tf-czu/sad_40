@@ -2,30 +2,6 @@
   "version": 2,
   "robot": {
     "modules": {
-      "oak_camera": {
-          "driver": "osgar.drivers.oak_camera:OakCamera",
-          "init": {
-            "fps": 5,
-            "is_color": true,
-            "is_depth": true,
-            "laser_projector_current": 1200,
-            "is_imu_enabled": true,
-            "number_imu_records": 20,
-            "disable_magnetometer_fusion": true,
-            "cam_ip": "192.168.1.53",
-
-            "mono_resolution": "THE_400_P",
-            "color_resolution": "THE_1080_P",
-            "color_manual_focus": null,
-
-            "stereo_median_filter": "KERNEL_3x3",
-            "stereo_mode": "HIGH_ACCURACY",
-            "stereo_extended_disparity": false,
-            "stereo_subpixel": true,
-            "stereo_left_right_check": true
-          }
-      },
-
       "arecont": {
         "driver": "arecont:Arecont",
         "out": "image",
@@ -43,6 +19,15 @@
               "subsample": 5
           }
       },
+      "route_cam2": {
+        "driver": "routecam:RouteCam",
+          "in": [],
+          "out": ["image"],
+          "init": {
+              "rtsp_url": "rtsp://192.168.1.56:5005/routecam",
+              "subsample": 5
+          }
+      },
       "qrdetec": {
         "driver": "qrdetec:QrDetec",
         "in": ["image"],
@@ -55,10 +40,10 @@
       },
 
       "from_spider": {
-          "driver": "subt.pull:Pull",
+          "driver": "osgar.drivers.pull:Pull",
           "init": {
             "endpoint": "tcp://192.168.1.17:5555",
-            "outputs": ["pose2d", "rotation", "pose3d", "scan", "position"]
+            "outputs": ["pose2d", "rotation", "pose3d", "position", "lidar_scan"]
           }
       }
 
