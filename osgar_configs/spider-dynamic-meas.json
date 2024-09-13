@@ -90,7 +90,7 @@
           "in": ["raw"],
           "out": ["raw"],
           "init": {
-              "host": "192.168.1.11",
+              "host": "192.168.1.13",
               "port": 10001,
               "bufsize": 2000
         }
@@ -102,7 +102,7 @@
             "is_color": true,
             "is_depth": true,
             "laser_projector_current": 1200,
-            "is_imu_enabled": true,
+            "is_imu_enabled": false,
             "number_imu_records": 20,
             "disable_magnetometer_fusion": true,
             "cam_ip": "192.168.1.53",
@@ -110,7 +110,7 @@
             "mono_resolution": "THE_720_P",
             "color_resolution": "THE_1080_P",
             "color_manual_focus": 130,
-            "color_manual_exposure": 1000,
+            "color_manual_exposure": [2000, 800],
 
             "stereo_median_filter": "KERNEL_3x3",
             "stereo_mode": "HIGH_ACCURACY",
@@ -141,7 +141,8 @@
               ["imu.rotation", "to_icp.rotation"],
               ["localization.pose3d", "to_icp.pose3d"],
               ["lidar.scan", "to_icp.lidar_scan"],
-              ["gps.position", "to_icp.position"]
+              ["gps.position", "to_icp.position"],
+              ["gps.nmea_data", "to_icp.nmea_data"]
     ]
   }
 }
