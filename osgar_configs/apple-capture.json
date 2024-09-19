@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "robot": {
+    "modules": {
+      "oak_1": {
+          "driver": "osgar.drivers.oak_camera:OakCamera",
+          "init": {
+            "cam_id": "19443010713D732700",
+            "fps": 15,
+            "is_depth": true,
+            "is_stereo_images": true,
+            "disable_magnetometer_fusion": false,
+            "mono_resolution": [1280, 720],
+            "stereo_median_filter": "KERNEL_7x7",
+            "stereo_mode": "HIGH_ACCURACY",
+            "stereo_extended_disparity": false,
+            "stereo_sub pixel": false,
+            "stereo_left_right_check": true,
+
+            "stereo_manual_exposure": [1000, 200],
+            "stereo_manual_wb": 3000
+          }
+      },
+      "oak_2": {
+          "driver": "osgar.drivers.oak_camera:OakCamera",
+          "init": {
+            "cam_id": "1944301031DE782700",
+            "fps": 15,
+            "is_depth": true,
+            "is_stereo_images": true,
+            "disable_magnetometer_fusion": false,
+            "mono_resolution": [1280, 720],
+            "stereo_median_filter": "KERNEL_7x7",
+            "stereo_mode": "HIGH_ACCURACY",
+            "stereo_extended_disparity": false,
+            "stereo_subpixel": false,
+            "stereo_left_right_check": true,
+
+            "stereo_manual_exposure": [1000, 200],
+            "stereo_manual_wb": 3000
+          }
+      }
+    },
+    "links": []
+  }
+}
