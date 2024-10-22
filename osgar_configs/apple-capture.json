@@ -17,10 +17,10 @@
             "stereo_sub pixel": false,
             "stereo_left_right_check": true,
 
-            "stereo_manual_exposure": [1000, 200],
-            "stereo_manual_wb": 3000
+            "stereo_manual_exposure": [1000, 100]
           }
       },
+
       "oak_2": {
           "driver": "osgar.drivers.oak_camera:OakCamera",
           "init": {
@@ -36,8 +36,7 @@
             "stereo_subpixel": false,
             "stereo_left_right_check": true,
 
-            "stereo_manual_exposure": [1000, 200],
-            "stereo_manual_wb": 3000
+            "stereo_manual_exposure": [1000, 100]
           }
       }
     },
