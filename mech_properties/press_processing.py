@@ -7,7 +7,8 @@ import sys
 import numpy as np
 from matplotlib import pyplot as plt
 
-SMOOT_INTERVAL = 20
+SMOOT_INTERVAL = 3
+FORCE_SCALE = 1.979
 
 
 def cut_data(time, force, positions):
@@ -50,7 +51,7 @@ def load_data(log_file):
             positions.append(p)
 
     time_stamps, forces, positions = cut_data(np.array(time_stamps), np.array(forces), np.array(positions))
-    forces = -forces
+    forces = -forces * FORCE_SCALE
     deform = (positions[0] - positions)/1000
 
     return forces, deform  # time is not needed yet
@@ -61,7 +62,10 @@ def draw_sample(forces, deform, dir, fig_name):
     n = SMOOT_INTERVAL
     smoothed_force = np.convolve(forces, np.ones(n)/n, mode='valid')
     smoothed_deform = np.convolve(deform, np.ones(n)/n, mode='valid')
-    d_force = np.diff(smoothed_force) / np.diff(smoothed_deform)
+
+    smoothed_force_2 = np.convolve(forces, np.ones(20) / 20, mode='valid')  # just for derivation
+    smoothed_deform_2 = np.convolve(deform, np.ones(20) / 20, mode='valid')  # just for derivation
+    d_force = np.diff(smoothed_force_2) / np.diff(smoothed_deform_2)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
     ax1.plot(deform, forces, "k.", label= "Raw force")
@@ -71,11 +75,12 @@ def draw_sample(forces, deform, dir, fig_name):
     ax1.set_ylabel("Force (N)")
     ax1.legend()
 
-    ax2.plot(smoothed_deform[:-1], d_force, "k-")
+    ax2.plot(smoothed_deform_2[:-1], d_force, "k-")
     ax2.set_xlabel("Deformation (mm)")
     ax2.set_ylabel("Force derivation (N mm$^{-1}$)")
 
     # plt.show()
+    # assert False
     fig_path = os.path.join(dir, "tmp", fig_name)
     plt.savefig(fig_path, dpi=500)
     plt.close()
