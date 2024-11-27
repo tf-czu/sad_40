@@ -11,6 +11,21 @@ SMOOT_INTERVAL = 3
 FORCE_SCALE = 1.979
 
 
+def discrete_derivative(x_data, y_data, interval = 10):
+    assert len(x_data) == len(y_data), (len(x_data), len(y_data))
+    n = len(y_data) - interval
+    x_ret = []
+    y_ret = []
+    for ii in range(n):
+        x = x_data[ii: ii + interval]
+        y = y_data[ii: ii + interval]
+        slope, intercept = np.polyfit(x, y, 1)
+        x_ret.append((x[0] + x[-1])/2)
+        y_ret.append(slope)
+
+    return x_ret, y_ret
+
+
 def cut_data(time, force, positions):
     # touch detection
     is_force_change = np.diff(force) < -0.05
@@ -63,11 +78,11 @@ def draw_sample(forces, deform, dir, fig_name):
     smoothed_force = np.convolve(forces, np.ones(n)/n, mode='valid')
     smoothed_deform = np.convolve(deform, np.ones(n)/n, mode='valid')
 
-    smoothed_force_2 = np.convolve(forces, np.ones(20) / 20, mode='valid')  # just for derivation
-    smoothed_deform_2 = np.convolve(deform, np.ones(20) / 20, mode='valid')  # just for derivation
-    d_force = np.diff(smoothed_force_2) / np.diff(smoothed_deform_2)
+    deform_2, d_force = discrete_derivative(deform, forces, interval=20)
+    deform_3, dd_force = discrete_derivative(deform_2, d_force, interval=20)
+    deform_4, dd_force_2 = discrete_derivative(deform_2, d_force, interval=400)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(10, 10))
     ax1.plot(deform, forces, "k.", label= "Raw force")
     # ax1.plot(deform[n//2:len(smoothed_force)+n//2], smoothed_force, "r-", label="Smoothed_force")
     ax1.plot(smoothed_deform, smoothed_force, "r-", label="Smoothed Force")
@@ -75,9 +90,17 @@ def draw_sample(forces, deform, dir, fig_name):
     ax1.set_ylabel("Force (N)")
     ax1.legend()
 
-    ax2.plot(smoothed_deform_2[:-1], d_force, "k-")
+    ax2.plot(deform_2, d_force, "k-")
     ax2.set_xlabel("Deformation (mm)")
     ax2.set_ylabel("Force derivation (N mm$^{-1}$)")
+
+    ax3.plot(deform_3, dd_force, "k-")
+    ax3.set_xlabel("Deformation (mm)")
+    ax3.set_ylabel("2. Force derivation (N mm$^{-2}$)")
+
+    ax4.plot(deform_4, dd_force_2, "k-")
+    ax4.set_xlabel("Deformation (mm)")
+    ax4.set_ylabel("2. Force derivation (N mm$^{-2}$)")
 
     # plt.show()
     # assert False
