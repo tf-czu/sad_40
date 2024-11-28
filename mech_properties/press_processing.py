@@ -45,6 +45,18 @@ def cut_data(time, force, positions):
     return time[start:end], force[start:end], positions[start:end]
 
 
+def get_first_f_peak(x, y):  # copy paste from cereal_monitor
+    yd = np.diff(y)
+    ydd = np.diff(yd)
+    ex = yd[:-1] * yd[1:]
+    y_max = np.logical_and(ex <= 0, ydd < 0)
+    assert len(y_max) >= 0
+    y_ret = y[1:-1][y_max][0]
+    x_ret = x[1:-1][y_max][0]
+
+    return x_ret, y_ret
+
+
 def load_data(log_file):
     time_stamps = []
     forces = []
@@ -72,7 +84,7 @@ def load_data(log_file):
     return forces, deform  # time is not needed yet
 
 
-def draw_sample(forces, deform, dir, fig_name):
+def draw_sample(forces, deform, fig_path):
     # prepare data
     n = SMOOT_INTERVAL
     smoothed_force = np.convolve(forces, np.ones(n)/n, mode='valid')
@@ -104,27 +116,112 @@ def draw_sample(forces, deform, dir, fig_name):
 
     # plt.show()
     # assert False
-    fig_path = os.path.join(dir, "tmp", fig_name)
     plt.savefig(fig_path, dpi=500)
     plt.close()
 
 
-def draw_all_data(dir):
-    items_in_dir = sorted(os.listdir(dir))
+def load_all(dir_name):
+    data = []
+    items_in_dir = sorted(os.listdir(dir_name))
     for item in items_in_dir:
-        file_path = os.path.join(dir, item)
+        file_path = os.path.join(dir_name, item)
         if os.path.isfile(file_path) and "thr_" in item:
-            print(item)
             forces, deform = load_data(file_path)
             fig_name = item.replace(".txt", ".png")
-            draw_sample(forces, deform, dir, fig_name)
+            fig_path = os.path.join(dir_name, "tmp", fig_name)
+            data.append([forces, deform, fig_path])
 
+    return data
+
+
+def draw_all_data(dir_name):
+    data = load_all(dir_name)
+    for forces, deform, fig_path in data:
+        print(fig_path)
+        draw_sample(forces, deform, fig_path)
+
+def prepper_data(deform, force):
+    n = SMOOT_INTERVAL
+    smoothed_force = np.convolve(force, np.ones(n) / n, mode='valid')
+    smoothed_deform = np.convolve(deform, np.ones(n) / n, mode='valid')
+    x_a, f_a = get_first_f_peak(smoothed_deform, smoothed_force)
+    f_max = max(smoothed_force)
+    x_max = smoothed_deform[smoothed_force.argmax()]
+
+    return smoothed_deform, smoothed_force, [x_a, f_a], [x_max, f_max]
+
+
+class PlotAnnotation:
+    def __init__(self, dir_name):
+        self.dir_name = dir_name
+        self.last_key_event = None
+        self.last_click_pose = None
+
+    def on_key(self, event):
+        self.last_key_event = event.key
+
+    def on_clik(self, event):
+        self.last_click_pose = [event.xdata, event.ydata]
+
+    def annotation(self, data):
+        fig = plt.figure(figsize=(5, 5))
+        fig.canvas.mpl_connect('key_press_event', self.on_key)
+        fig.canvas.mpl_connect('button_press_event', self.on_clik)
+        fig.subplots_adjust(left=0.15, bottom=0.15)
+        ax1 = fig.add_subplot(111)
+        plot_1, = ax1.plot([0, 1], [0, 1], "k+")  # define initial plot
+        plot_a, = ax1.plot(0, 0, "ro")  # define initial plot
+        plot_max, = ax1.plot(0, 0, "ro")  # define initial plot
+
+        ii = 0
+        print(ii)
+        while True:
+            ii = max(0, min(len(data)-1, ii))
+            forces, deform, fig_path = data[ii]
+            smoothed_deform, smoothed_force, [x_a, f_a], [x_max, f_max] = prepper_data(deform, forces)
+            # print([x_a, f_a], [x_max, f_max])
+
+            plot_1.set_data(smoothed_deform, smoothed_force)
+            plot_a.set_data([x_a], [f_a])
+            plot_max.set_data([x_max], [f_max])
+
+            ax1.relim()
+            ax1.autoscale_view()
+
+            plt.draw()
+            plt.pause(0.5)
+
+            if self.last_key_event == "right":
+                self.last_key_event = None
+                ii += 1
+                print(ii)
+
+            if self.last_key_event == "left":
+                self.last_key_event = None
+                ii -= 1
+                print(ii)
+
+            if self.last_key_event == "e":
+                plt.clf()
+                break
+
+
+
+
+def perform_annotation(dir_name):
+    data = load_all(dir_name)
+    annotate = PlotAnnotation(dir_name)
+    annotate.annotation(data)
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('directory', help='Path to data directory')
+    parser.add_argument("--annotation", "-a", help="Annotate plots", action="store_true")
     args = parser.parse_args()
 
-    draw_all_data(args.directory)
+    if args.annotation:
+        perform_annotation(args.directory)
+    else:
+        draw_all_data(args.directory)
