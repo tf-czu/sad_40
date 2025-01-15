@@ -6,6 +6,7 @@ import sys
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy import optimize
 
 SMOOT_INTERVAL = 3
 FORCE_SCALE = 1.979
@@ -170,6 +171,7 @@ class PlotAnnotation:
         fig.subplots_adjust(left=0.15, bottom=0.15)
         ax1 = fig.add_subplot(111)
         plot_1, = ax1.plot([0, 1], [0, 1], "k+")  # define initial plot
+        plot_rear, = ax1.plot([0, 1], [0, 1], "r-")
         plot_a, = ax1.plot(0, 0, "ro")  # define initial plot
         plot_max, = ax1.plot(0, 0, "ro")  # define initial plot
 
@@ -180,10 +182,13 @@ class PlotAnnotation:
             forces, deform, fig_path = data[ii]
             smoothed_deform, smoothed_force, [x_a, f_a], [x_max, f_max] = prepper_data(deform, forces)
             # print([x_a, f_a], [x_max, f_max])
+            max_id = np.argmin(abs(deform - (x_max + 1)))
+            rear_average = np.mean(forces[max_id:])
 
             plot_1.set_data(smoothed_deform, smoothed_force)
             plot_a.set_data([x_a], [f_a])
             plot_max.set_data([x_max], [f_max])
+            plot_rear.set_data([x_max + 1, 5], [rear_average, rear_average])
 
             ax1.relim()
             ax1.autoscale_view()
@@ -204,8 +209,6 @@ class PlotAnnotation:
             if self.last_key_event == "e":
                 plt.clf()
                 break
-
-
 
 
 def perform_annotation(dir_name):
