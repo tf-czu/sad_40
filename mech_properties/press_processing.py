@@ -3,14 +3,21 @@
 """
 import os
 import sys
+import csv
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy import optimize
 
 SMOOT_INTERVAL = 3
 FORCE_SCALE = 1.979
 
+
+def write_data(data, csv_file_name):
+    with open(csv_file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        writer.writerow(["id", "Fa", "k_a", "Fb", "Fa/Fb", "Ft", "rear_slope"])  # header
+        for item in data:
+            writer.writerow(item)
 
 def discrete_derivative(x_data, y_data, interval = 10):
     assert len(x_data) == len(y_data), (len(x_data), len(y_data))
@@ -81,8 +88,10 @@ def load_data(log_file):
     time_stamps, forces, positions = cut_data(np.array(time_stamps), np.array(forces), np.array(positions))
     forces = -forces * FORCE_SCALE
     deform = (positions[0] - positions)/1000
+    # limit to 5 mm
+    limit_id = np.argmin(abs(deform - 5))
 
-    return forces, deform  # time is not needed yet
+    return forces[:limit_id], deform[:limit_id]  # time is not needed yet
 
 
 def draw_sample(forces, deform, fig_path):
@@ -157,6 +166,7 @@ class PlotAnnotation:
         self.dir_name = dir_name
         self.last_key_event = None
         self.last_click_pose = None
+        self.out_data = []  # to be added items: [label, Fa, k_a, Fb, Fa/Fb, Ft, rear_slope]
 
     def on_key(self, event):
         self.last_key_event = event.key
@@ -172,7 +182,9 @@ class PlotAnnotation:
         ax1 = fig.add_subplot(111)
         plot_1, = ax1.plot([0, 1], [0, 1], "k+")  # define initial plot
         plot_rear, = ax1.plot([0, 1], [0, 1], "r-")
+        plot_rear_slope, = ax1.plot([0, 1], [0, 1], "y-")
         plot_a, = ax1.plot(0, 0, "ro")  # define initial plot
+        plot_ap, = ax1.plot([0, 1], [0, 1], "r-")
         plot_max, = ax1.plot(0, 0, "ro")  # define initial plot
 
         ii = 0
@@ -180,15 +192,27 @@ class PlotAnnotation:
         while True:
             ii = max(0, min(len(data)-1, ii))
             forces, deform, fig_path = data[ii]
+            label = os.path.basename(fig_path)[4:8]
             smoothed_deform, smoothed_force, [x_a, f_a], [x_max, f_max] = prepper_data(deform, forces)
             # print([x_a, f_a], [x_max, f_max])
-            max_id = np.argmin(abs(deform - (x_max + 1)))
-            rear_average = np.mean(forces[max_id:])
+
+            rear_id = np.argmin(abs(deform - (x_max + 1)))
+            rear_average = np.mean(forces[rear_id:])
+            coeff = np.polyfit(deform[rear_id:], forces[rear_id:], 1)
+            rear_slope, intercept = coeff
+            p_rear = np.poly1d(coeff)
+
+            a_id = np.argmin(abs(deform - x_a))
+            coeff = np.polyfit(deform[:a_id], forces[:a_id], 1)
+            k_a, intercept = coeff
+            pa = np.poly1d(coeff)
 
             plot_1.set_data(smoothed_deform, smoothed_force)
             plot_a.set_data([x_a], [f_a])
             plot_max.set_data([x_max], [f_max])
+            plot_ap.set_data(deform[:a_id], [pa(deform[:a_id])])
             plot_rear.set_data([x_max + 1, 5], [rear_average, rear_average])
+            plot_rear_slope.set_data(deform[rear_id:], p_rear(deform[rear_id:]))
 
             ax1.relim()
             ax1.autoscale_view()
@@ -198,16 +222,24 @@ class PlotAnnotation:
 
             if self.last_key_event == "right":
                 self.last_key_event = None
-                ii += 1
                 print(ii)
+                ii += 1
 
             if self.last_key_event == "left":
                 self.last_key_event = None
-                ii -= 1
                 print(ii)
+                ii -= 1
+
+            if self.last_key_event == "w":
+                self.last_key_event = None
+                self.out_data.append([label, f_a, k_a, f_max, f_a/f_max, rear_average, rear_slope])
+                print(f"Saved item {ii}, {label}")
+                plt.savefig(os.path.join(self.dir_name, "tmp2", f"thr_fig_{label}"))
+                ii += 1
 
             if self.last_key_event == "e":
                 plt.clf()
+                write_data(self.out_data, os.path.join(self.dir_name, "out_data.csv"))
                 break
 
 
