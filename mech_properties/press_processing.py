@@ -182,10 +182,13 @@ class PlotAnnotation:
         ax1 = fig.add_subplot(111)
         plot_1, = ax1.plot([0, 1], [0, 1], "k+")  # define initial plot
         plot_rear, = ax1.plot([0, 1], [0, 1], "r-")
-        plot_rear_slope, = ax1.plot([0, 1], [0, 1], "y-")
+        # plot_rear_slope, = ax1.plot([0, 1], [0, 1], "y-")
         plot_a, = ax1.plot(0, 0, "ro")  # define initial plot
         plot_ap, = ax1.plot([0, 1], [0, 1], "r-")
         plot_max, = ax1.plot(0, 0, "ro")  # define initial plot
+        
+        ax1.set_xlabel("Deformace (mm)")
+        ax1.set_ylabel("Síla (N)")
 
         ii = 0
         print(ii)
@@ -212,7 +215,7 @@ class PlotAnnotation:
             plot_max.set_data([x_max], [f_max])
             plot_ap.set_data(deform[:a_id], [pa(deform[:a_id])])
             plot_rear.set_data([x_max + 1, 5], [rear_average, rear_average])
-            plot_rear_slope.set_data(deform[rear_id:], p_rear(deform[rear_id:]))
+            #plot_rear_slope.set_data(deform[rear_id:], p_rear(deform[rear_id:]))
 
             ax1.relim()
             ax1.autoscale_view()
@@ -234,7 +237,7 @@ class PlotAnnotation:
                 self.last_key_event = None
                 self.out_data.append([label, f_a, k_a, f_max, f_a/f_max, rear_average, rear_slope])
                 print(f"Saved item {ii}, {label}")
-                plt.savefig(os.path.join(self.dir_name, "tmp2", f"thr_fig_{label}"))
+                plt.savefig(os.path.join(self.dir_name, "v", f"thr_fig_{label}"), dpi=500)
                 ii += 1
 
             if self.last_key_event == "e":
