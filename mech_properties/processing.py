@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-DATA_PATH = "mech_properties/data_2023"
-DATA_FILE = "Otlaky_2023.csv"
+DATA_PATH = "mech_properties/data_2024"
+DATA_FILE = "otlaky_2024.csv"
 
 E_45 = 0.119 # J, kinetic energy during impact (angle 45 deg.)
 E_75 = 0.301 # J, kinetic energy during impact (angle 75 deg.)
@@ -83,7 +83,9 @@ def pendulum_reflection(file_name, debug = False, n = 3):
 
 def get_file_name(key_string, file_list):
     ret = [name for name in file_list if key_string in name]
-    assert len(ret) == 1, ret
+    assert len(ret) <= 1, ret
+    if len(ret) == 0:
+        return None
     return ret[0]
 
 
@@ -95,7 +97,7 @@ def load_data():
         next(csv_reader)
         for row in csv_reader:
             print(row)
-            assert len(row) == 8
+            # assert len(row) == 8
             label = row[0]
             mass = float(row[1]) if row[1] else None
             height, d1, d2 = [float(num) for num in row[2:5]]
@@ -107,7 +109,7 @@ def load_data():
     # Load files list
     file_list = os.listdir(os.path.join(DATA_PATH, "data"))
     file_list = [item for item in file_list if "pendulum" in item]
-    assert len(file_list) == 180
+    # assert len(file_list) == 180
 
     return main_data_in, file_list
 
@@ -123,6 +125,8 @@ def main():
         # Find relevant file name
         key_string = f"{label[0]}_{label[1:]}"
         pendulum_fn = get_file_name(key_string, file_list)
+        if pendulum_fn is None:
+            continue
 
         # if label in ["F20", "G08", "I09", "K05", "K06"]:
         #    debug = True
