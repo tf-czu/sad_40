@@ -95,10 +95,12 @@
               "bufsize": 2000
         }
       },
+
       "oak_camera": {
           "driver": "osgar.drivers.oak_camera:OakCamera",
           "init": {
-            "fps": 5,
+            "fps": 20,
+            "subsample": 4,
             "is_color": true,
             "is_depth": true,
             "laser_projector_current": 1200,
@@ -117,6 +119,17 @@
             "stereo_extended_disparity": false,
             "stereo_subpixel": true,
             "stereo_left_right_check": true
+          }
+      },
+
+      "cam_left": {
+          "driver": "osgar.drivers.oak_camera:OakCamera",
+          "init": {
+            "fps": 20,
+            "subsample": 4,
+            "is_color": true,
+            "cam_ip": "192.168.1.64",
+            "color_resolution": "THE_800_P"
           }
       }
     },
