@@ -102,7 +102,7 @@
             "subsample": 2,
             "is_color": true,
             "is_depth": true,
-            "laser_projector_current": 1200,
+            "laser_projector_current": 1000,
             "is_imu_enabled": false,
             "number_imu_records": 20,
             "disable_magnetometer_fusion": true,
