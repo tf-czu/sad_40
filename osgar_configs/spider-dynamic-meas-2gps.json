@@ -106,7 +106,7 @@
             "is_imu_enabled": false,
             "number_imu_records": 20,
             "disable_magnetometer_fusion": false,
-            "cam_id": "192.168.1.55",
+            "cam_id": "192.168.1.53",
 
             "mono_resolution": "THE_720_P",
             "color_resolution": "THE_800_P",
