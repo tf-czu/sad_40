@@ -34,4 +34,3 @@ if __name__ == "__main__":
 
     data, variables = load_data(args.csvfile)
     draw_matrix(data, variables)
-    
