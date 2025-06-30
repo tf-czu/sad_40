@@ -98,17 +98,18 @@
       "oak_camera": {
           "driver": "osgar.drivers.oak_camera:OakCamera",
           "init": {
-            "fps": 5,
+            "fps": 10,
+            "subsample": 2,
             "is_color": true,
             "is_depth": true,
             "laser_projector_current": 1200,
             "is_imu_enabled": false,
             "number_imu_records": 20,
             "disable_magnetometer_fusion": true,
-            "cam_ip": "192.168.1.53",
+            "cam_id": "192.168.1.55",
 
             "mono_resolution": "THE_720_P",
-            "color_resolution": "THE_1080_P",
+            "color_resolution": "THE_800_P",
             "color_manual_focus": 130,
             "color_manual_exposure": [2000, 800],
 
