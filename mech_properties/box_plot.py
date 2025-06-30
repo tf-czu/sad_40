@@ -32,8 +32,8 @@ def compare_data(data):
     fig.subplots_adjust(left=0.07, right=0.97, bottom=0.05, top=0.95, hspace=0.4, wspace=0.15)
     x = [1, 2, 3, 4, 5, 6]
     genotypes = [genotype for genotype in data]
-    parms_labels = ["Density", "Volume", "Fa", "Ka", "Fb", "Kf", "Ft"]
-    parms_titles = ["Density (g cm$^{-3}$)", "Volume (cm$^3$)", "$Fa$ (N)", "$Ka$ (N mm$^{-1}$)", "$Fb$ (N)", "$Kf$ (-)", "$Ft$ (N)"]
+    parms_labels = ["Density", "Volume", "Pa", "Ka", "Pb", "Kf", "Pc"]
+    parms_titles = ["Density (g cm$^{-3}$)", "Volume (cm$^3$)", "$Pa$ (MPa)", "$Ka$ (N mm$^{-1}$)", "$Pb$ (MPa)", "$Kf$ (-)", "$Pc$ (MPa)"]
 
     for ii, (parm, par_title) in enumerate(zip(parms_labels, parms_titles)):
         print(parm)
