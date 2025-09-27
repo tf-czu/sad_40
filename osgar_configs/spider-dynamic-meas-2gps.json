@@ -102,11 +102,11 @@
             "subsample": 2,
             "is_color": true,
             "is_depth": true,
-            "laser_projector_current": 1200,
+            "laser_projector_current": 1000,
             "is_imu_enabled": false,
             "number_imu_records": 20,
-            "disable_magnetometer_fusion": true,
-            "cam_id": "192.168.1.55",
+            "disable_magnetometer_fusion": false,
+            "cam_id": "192.168.1.53",
 
             "mono_resolution": "THE_720_P",
             "color_resolution": "THE_800_P",
@@ -119,7 +119,19 @@
             "stereo_subpixel": true,
             "stereo_left_right_check": true
           }
+      },
+
+      "rtk_gps": {
+        "driver": "gps",
+        "init": {}
+      },
+      "rtk_gps_serial": {
+        "driver": "serial",
+        "in": ["raw"],
+        "out": ["raw"],
+        "init": {"port": "/dev/ttyACM0", "speed": 115200}
       }
+
     },
     "links": [["spider.can", "can.can"],
               ["can.can", "spider.can"],
@@ -143,7 +155,9 @@
               ["localization.pose3d", "to_icp.pose3d"],
               ["lidar.scan", "to_icp.lidar_scan"],
               ["gps.position", "to_icp.position"],
-              ["gps.nmea_data", "to_icp.nmea_data"]
+              ["gps.nmea_data", "to_icp.nmea_data"],
+
+              ["rtk_gps_serial.raw", "rtk_gps.raw"]
     ]
   }
 }
