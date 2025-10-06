@@ -164,6 +164,11 @@ def prepper_data(deform, force):
 class PlotAnnotation:
     def __init__(self, dir_name):
         self.dir_name = dir_name
+        try:
+            os.makedirs(os.path.join(self.dir_name, "tmp2"))
+        except FileExistsError:
+            print("The directory tmp2 already exist. Remove it!")
+            sys.exit()
         self.last_key_event = None
         self.last_click_pose = None
         self.out_data = []  # to be added items: [label, Fa, k_a, Fb, Fa/Fb, Ft, rear_slope]
@@ -237,7 +242,7 @@ class PlotAnnotation:
                 self.last_key_event = None
                 self.out_data.append([label, f_a, k_a, f_max, f_a/f_max, rear_average, rear_slope])
                 print(f"Saved item {ii}, {label}")
-                plt.savefig(os.path.join(self.dir_name, "v", f"thr_fig_{label}"), dpi=500)
+                plt.savefig(os.path.join(self.dir_name, "tmp2", f"thr_fig_{label}"), dpi=500)
                 ii += 1
 
             if self.last_key_event == "e":
